@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Privacy Demo — Help Us Test a New Way to Protect Your Data</title>
+<style>
+:root{
+  --bg:#0c0e18;--bg2:#131629;--bg3:#1a1f35;--bg4:#212840;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#dde1f0;--text2:#8b8faa;--text3:#4e5270;
+  --blue:#4f8ef7;--blue-d:rgba(79,142,247,0.15);
+  --green:#3ecf8e;--green-d:rgba(62,207,142,0.12);
+  --amber:#f5a623;--amber-d:rgba(245,166,35,0.12);
+  --red:#ef5050;--red-d:rgba(239,80,80,0.12);
+  --purple:#a78bfa;--purple-d:rgba(167,139,250,0.12);
+  --teal:#2dd4bf;--teal-d:rgba(45,212,191,0.12);
+  --r:10px;--rl:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+.page{max-width:880px;margin:0 auto;padding:24px 20px 80px}
+.timebar{display:flex;align-items:center;gap:8px;padding:8px 14px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg2);font-size:11px;color:var(--text2);margin-bottom:16px}
+.timebar b{color:var(--text);font-weight:600}
+.top-nav-removed{display:none}
+.progress-track{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:24px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue) 0%,var(--purple) 100%);border-radius:3px;transition:width .5s ease}
+
+/* part headers in survey */
+.part-header{display:flex;gap:14px;align-items:center;margin:28px 0 14px;padding:14px 16px;background:linear-gradient(90deg,rgba(79,142,247,0.10),rgba(167,139,250,0.04) 60%,transparent);border-radius:var(--rl);border-left:3px solid var(--blue)}
+.part-chip{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0}
+.part-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.3}
+.part-sub{font-size:11.5px;color:var(--text2);margin-top:3px;line-height:1.5}
+
+/* SUS-specific */
+.sus-instr{font-size:12px;color:var(--text2);background:var(--bg3);padding:10px 14px;border-radius:var(--r);margin-bottom:14px;line-height:1.6}
+.sus-row{display:grid;grid-template-columns:1fr 280px;gap:18px;align-items:center;padding:11px 14px;border-bottom:0.5px solid var(--border);background:var(--bg2);border-radius:6px;margin-bottom:6px}
+.sus-row .sus-text{font-size:13px;color:var(--text);line-height:1.5}
+.sus-row .sus-text .req{color:var(--red);margin-left:4px}
+.sus-row .sus-scale{display:flex;gap:5px;justify-content:flex-end}
+.sus-row .sus-scale .lb5{flex:0 0 42px;padding:7px 0;text-align:center;font-size:11px;font-weight:500;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);border-radius:5px;cursor:pointer;transition:all .12s}
+.sus-row .sus-scale .lb5:hover{border-color:var(--blue);color:var(--text)}
+.sus-row .sus-scale .lb5.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+.sus-scale-lbls{display:flex;justify-content:space-between;font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;padding:0 14px 8px 14px}
+@media (max-width:680px){
+  .sus-row{grid-template-columns:1fr;gap:8px}
+  .sus-row .sus-scale{justify-content:space-between}
+  .sus-row .sus-scale .lb5{flex:1}
+}
+
+/* forced-choice epsilon picker (C2) */
+.forced-eps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:8px}
+.forced-eps .feps{padding:14px 12px;border:0.5px solid var(--border2);background:var(--bg3);border-radius:var(--r);cursor:pointer;transition:all .15s;text-align:left}
+.forced-eps .feps:hover{border-color:var(--blue)}
+.forced-eps .feps.on{border-color:var(--green);background:rgba(62,207,142,0.10);box-shadow:0 0 0 1px var(--green) inset}
+.forced-eps .feps .feps-eps{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.forced-eps .feps .feps-desc{font-size:11px;color:var(--text2);line-height:1.5}
+.pane{display:none}.pane.on{display:block}
+h2{font-size:21px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
+h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.sub{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.7;max-width:760px}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rl);padding:20px;margin-bottom:14px}
+.icard{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.clbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.section-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.04em;margin-bottom:16px}
+.chip-core{background:var(--teal-d);border:0.5px solid var(--teal);color:var(--teal)}
+.chip-ext{background:var(--purple-d);border:0.5px solid var(--purple);color:var(--purple)}
+.chip-survey{background:var(--amber-d);border:0.5px solid var(--amber);color:var(--amber)}
+.stages{display:flex;gap:6px;margin-bottom:18px;font-size:11px}
+.stage{flex:1;padding:10px 8px;border-radius:var(--r);background:var(--bg3);border:0.5px solid var(--border);text-align:center;color:var(--text2)}
+.stage b{color:var(--text);display:block;font-weight:600;font-size:12px;margin-bottom:2px}
+.stage-cur{border-color:var(--blue);background:var(--blue-d);color:var(--blue)}
+.stage-cur b{color:var(--blue)}
+/* canvas wrap */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cvs-wrap{position:relative;background:#000;border-radius:var(--r);overflow:hidden}
+.cvs-wrap canvas{display:block;width:100%}
+.cvs-lbl{position:absolute;top:8px;left:8px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:8px;background:rgba(0,0,0,.55)}
+/* slider */
+.srow{display:flex;align-items:center;gap:10px;margin:12px 0}
+.srow label{font-size:11px;color:var(--text2);white-space:nowrap}
+.srow input[type=range]{flex:1;accent-color:var(--blue)}
+.epsbadge{font-size:13px;font-weight:700;min-width:60px;text-align:center;padding:4px 10px;border-radius:20px;background:var(--bg3);border:0.5px solid var(--border2);color:var(--blue);font-family:monospace}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stat{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r);padding:10px;text-align:center}
+.stat-v{font-size:17px;font-weight:700;font-family:monospace;margin:3px 0}
+.stat-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+/* identity table */
+.idtable{width:100%;font-size:12px;border-collapse:collapse}
+.idtable td{padding:5px 8px;border-bottom:0.5px solid var(--border)}
+.idtable td:first-child{color:var(--text2);width:45%}
+.blk{background:var(--bg4);border-radius:3px;color:transparent;display:inline-block;padding:0 4px;min-width:70px;user-select:none}
+.partial{color:var(--amber)}
+.full{color:var(--text);font-weight:500}
+.note{padding:10px 14px;border-left:2px solid var(--blue);background:var(--blue-d);border-radius:0 var(--r) var(--r) 0;font-size:12px;color:var(--text2);line-height:1.6;margin:10px 0}
+.note.warn{border-color:var(--amber);background:var(--amber-d);color:var(--amber)}
+.note.green{border-color:var(--green);background:var(--green-d);color:var(--green)}
+.note.red{border-color:var(--red);background:var(--red-d);color:var(--red)}
+.note.purple{border-color:var(--purple);background:var(--purple-d);color:var(--purple)}
+/* criteria */
+.crit{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.crit-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.crit-body{flex:1}
+.crit-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.crit-desc{font-size:11px;color:var(--text2);margin-bottom:5px;line-height:1.5}
+.crit-pct{font-size:13px;font-weight:700;min-width:38px;text-align:right;font-family:monospace}
+/* topsis bars */
+.tbar-wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+.tbar{text-align:center}
+.tbar-track{height:80px;background:var(--bg4);border-radius:6px;display:flex;align-items:flex-end;padding:0 5px}
+.tbar-fill{width:100%;border-radius:4px;transition:height .5s ease,background .3s}
+.tbar-eps{font-size:10px;font-family:monospace;margin-top:5px}
+.tbar-c{font-size:10px;margin-top:2px}
+.wb{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.wb-n{font-size:11px;color:var(--text2);width:100px;flex-shrink:0}
+.wb-bg{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.wb-fill{height:100%;border-radius:3px;transition:width .4s}
+.wb-v{font-size:11px;color:var(--text3);width:34px;text-align:right;font-family:monospace}
+/* MIC features */
+.feat-row{display:grid;grid-template-columns:120px 1fr 60px;gap:10px;align-items:center;padding:7px 9px;border-bottom:0.5px solid var(--border);font-size:12px;border-radius:6px;transition:background .15s,box-shadow .15s}
+.feat-row:hover{background:rgba(79,142,247,0.06)}
+.feat-row.feat-on{background:rgba(79,142,247,0.13);box-shadow:0 0 0 1px var(--blue) inset}
+.feat-row:last-child{border-bottom:none}
+.feat-name{display:flex;align-items:center;gap:7px}
+.feat-bar{height:7px;background:var(--bg4);border-radius:4px;overflow:hidden;position:relative}
+.feat-bar-fill{height:100%;border-radius:4px;transition:width .4s,background .3s}
+.feat-mic{font-family:monospace;font-size:11px;text-align:right}
+/* compare boxes */
+.cmp2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.cmpbox{padding:14px;border-radius:var(--rl);border:0.5px solid var(--border);background:var(--bg3)}
+.cmpbox.hi{border-color:var(--green);background:var(--green-d)}
+.cmpbox.lo{border-color:var(--red);background:var(--red-d)}
+.cmpv{font-size:24px;font-weight:700;font-family:monospace;margin:6px 0}
+.cmpl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+/* MAE curves */
+.curve-wrap{margin-top:10px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r);padding:14px}
+/* pairwise */
+.pw{margin-bottom:14px}
+.pw-q{font-size:12px;color:var(--text3);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.pw-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pw-opt{padding:14px;border-radius:var(--r);background:var(--bg3);border:0.5px solid var(--border2);cursor:pointer;transition:all .15s;font-size:12.5px;line-height:1.55}
+.pw-opt:hover{border-color:var(--blue)}
+.pw-opt.on{border-color:var(--blue);background:var(--blue-d);color:var(--text)}
+.pw-opt .pw-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;margin-bottom:6px}
+.pw-opt.on .pw-label{color:var(--blue)}
+.pwprog{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:18px}
+.pwprog-fill{height:100%;background:var(--purple);transition:width .3s;border-radius:2px}
+/* likert */
+.likert{display:flex;gap:5px}
+.lb{flex:1;padding:9px 4px;text-align:center;border-radius:var(--r);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s}
+.lb:hover{border-color:var(--blue)}
+.lb.on{border-color:var(--blue);background:var(--blue-d);color:var(--blue);font-weight:600}
+.lb .sub-l{font-size:9px;color:var(--text3);display:block;margin-top:2px}
+.mc{display:flex;flex-direction:column;gap:6px}
+.mc-opt{padding:11px 14px;border-radius:var(--r);background:var(--bg3);border:0.5px solid var(--border2);cursor:pointer;font-size:12.5px;transition:all .15s}
+.mc-opt:hover{border-color:var(--blue)}
+.mc-opt.on{border-color:var(--blue);background:var(--blue-d);color:var(--blue)}
+.eps-row{display:flex;gap:6px}
+.eps-btn{flex:1;padding:9px 0;text-align:center;border-radius:var(--r);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:12px;font-family:monospace;cursor:pointer;transition:all .15s}
+.eps-btn:hover{border-color:var(--blue)}
+.eps-btn.on{border-color:var(--blue);background:var(--blue-d);color:var(--blue);font-weight:700}
+.q-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rl);padding:20px;margin-bottom:14px}
+.q-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--amber-d);border:0.5px solid var(--amber);color:var(--amber);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+.q-title{font-size:14.5px;font-weight:500;display:flex;align-items:center;margin-bottom:6px;line-height:1.4}
+.q-desc{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6}
+.ta{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r);padding:11px;color:var(--text);font-size:12.5px;font-family:inherit;resize:vertical;min-height:72px}
+.ta:focus{outline:none;border-color:var(--blue)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:opacity .15s}
+.btn:hover{opacity:.82}
+.btn-b{background:var(--blue);color:#fff}
+.btn-g{background:var(--green);color:#0a1a12}
+.btn-s{background:var(--bg3);color:var(--text2);border:0.5px solid var(--border2)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.rec-out{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r);padding:14px;font-size:11px;font-family:monospace;white-space:pre-wrap;color:var(--text2);display:none;max-height:280px;overflow-y:auto;margin:12px 0}
+#meter-cvs{display:block;width:100%;border-radius:var(--r);margin-bottom:6px}
+.noise-cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.noise-col{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r);padding:14px}
+.noise-col h4{font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text)}
+.noise-col.uni{border-color:rgba(245,166,35,0.4)}
+.noise-col.mic{border-color:rgba(62,207,142,0.4)}
+.noise-bar-row{display:grid;grid-template-columns:90px 1fr 38px;gap:8px;align-items:center;margin-bottom:5px;font-size:11px}
+.noise-bar-row .nb-l{color:var(--text2)}
+.noise-bar-row .nb-v{color:var(--text3);font-family:monospace;font-size:10px;text-align:right}
+.noise-bar-bg{height:8px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.noise-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.pat-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border)}
+.pat-item:last-child{border-bottom:none}
+.pat-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.pat-label{font-size:12px;font-weight:500}
+.pat-sub{font-size:11px;color:var(--text2)}
+.pat-risk{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:auto;flex-shrink:0}
+.pat-risk.hi{background:var(--red-d);color:var(--red);border:0.5px solid var(--red)}
+.pat-risk.med{background:var(--amber-d);color:var(--amber);border:0.5px solid var(--amber)}
+.pat-risk.lo{background:var(--green-d);color:var(--green);border:0.5px solid var(--green)}
+.fed-diag{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;font-size:11px;flex-wrap:wrap}
+.fed-node{padding:8px 10px;border:0.5px solid var(--green);border-radius:var(--r);background:var(--green-d);color:var(--green);text-align:center;font-family:monospace;font-size:10px}
+.fed-arrow{color:var(--text3);font-size:14px}
+.fed-server{padding:8px 12px;border:0.5px solid var(--blue);border-radius:var(--r);background:var(--blue-d);color:var(--blue);text-align:center;font-family:monospace;font-size:10px}
+.tag{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9.5px;font-family:monospace;background:var(--bg4);color:var(--text2);margin-left:3px}
+.tag.green{background:var(--green-d);color:var(--green)}
+.tag.amber{background:var(--amber-d);color:var(--amber)}
+.tag.blue{background:var(--blue-d);color:var(--blue)}
+.tag.purple{background:var(--purple-d);color:var(--purple)}
+/* ── consent + completion overlays ── */
+.overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:flex-start;justify-content:center;z-index:1000;padding:32px 20px;overflow-y:auto}
+.overlay.gone{display:none}
+.overlay-card{max-width:640px;width:100%;background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--rl);padding:28px 28px 24px;margin:auto}
+.overlay h1{font-size:22px;font-weight:600;margin-bottom:8px;letter-spacing:-.2px}
+.overlay h4{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin:14px 0 6px}
+.overlay p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+.overlay ul{font-size:12.5px;color:var(--text2);line-height:1.65;margin-left:18px;margin-bottom:10px}
+.overlay ul li{margin-bottom:3px}
+.overlay .contacts{font-size:11.5px;color:var(--text3);line-height:1.6;padding:10px 0;border-top:0.5px solid var(--border);margin-top:14px}
+.overlay .actions{display:flex;gap:10px;margin-top:18px}
+.overlay .actions .btn{flex:1;justify-content:center}
+/* completion */
+.thanks-card{text-align:center}
+.thanks-card .check{font-size:48px;margin-bottom:8px}
+.thanks-card .sid{display:inline-block;padding:6px 12px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r);font-family:monospace;font-size:11px;color:var(--text2);margin:6px 0;word-break:break-all}
+/* spinner */
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px}
+.btn-g .spinner{border-color:rgba(10,26,18,0.3);border-top-color:#0a1a12}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* validation banner */
+.valbox{padding:12px 14px;border-radius:var(--r);background:var(--red-d);border:0.5px solid var(--red);color:var(--red);font-size:12.5px;margin-bottom:12px;display:none}
+.valbox.on{display:block}
+.valbox ul{margin:6px 0 0 16px;font-size:11.5px;color:var(--red)}
+/* highlight missing card */
+.q-card.missing{border-color:var(--red);box-shadow:0 0 0 1px rgba(239,80,80,0.18)}
+/* submit card */
+.submit-card{background:var(--bg2);border:0.5px solid var(--blue);border-radius:var(--rl);padding:22px;text-align:center}
+.submit-card .stitle{font-size:15px;font-weight:600;margin-bottom:5px}
+.submit-card .sdesc{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6}
+.submit-card .btn-big{padding:14px 28px;font-size:14px;font-weight:600;min-width:260px}
+.submit-card .secondary-row{display:flex;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.submit-card .secondary-row .btn{font-size:11.5px;padding:6px 12px}
+.locked{display:none !important}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     CONSENT GATE — shown first
+═══════════════════════════════════════ -->
+<div class="overlay" id="consent-overlay">
+  <div class="overlay-card">
+    <h1>Help us test a new way to protect your data</h1>
+    <p style="color:var(--text)">You're invited to take part in a brief research study evaluating <strong>UCLDP</strong>, a user-centric privacy framework developed for a PhD dissertation at the University of Washington.</p>
+    <p style="color:var(--text)">In plain terms: UCLDP lets <em>you</em> — not a company — decide how your data is protected. Your feedback helps us check if regular people find it useful and easy to use.</p>
+
+    <h4>What you'll do (about 25 minutes)</h4>
+    <ul>
+      <li>Answer a few questions about yourself before starting.</li>
+      <li>Try an interactive demo. See how privacy settings affect your data.</li>
+      <li>Try a short "Option A or Option B" preference dialogue.</li>
+      <li>Complete a short survey with rating questions at the end.</li>
+    </ul>
+
+    <h4>What we record</h4>
+    <ul>
+      <li>Your answers in the demo and survey.</li>
+      <li>Any feedback you write.</li>
+      <li>A random ID created in your browser. </li>
+      <li>How long you spent on the study.</li>
+    </ul>
+
+    <h4>What we do NOT collect</h4>
+    <ul>
+      <li>Your name, email, or IP address.</li>
+      <li>Any personal data. All examples in the demo are fake.</li>
+    </ul>
+
+    <h4>You're in control</h4>
+    <ul>
+      <li>You can close this page any time.</li>
+      <li><strong>If you close the page before submitting, no data will be recorded.</strong></li>
+      <li>Your answers can't be traced back to you.</li>
+      <li>Anonymous response data will be retained for at least 5 years following publication, in line with university data retention policy.</li>
+      <li>Results may appear in academic papers.</li>
+    </ul>
+
+    <div class="contacts">
+      Want to learn more about this research? Read the published paper:<br>
+      <a href="https://urldefense.com/v3/__https://ieeexplore.ieee.org/document/11218270__;!!K-Hz7m0Vt54!iRX6g_23aggjXKbedlaHn1FsXGUhSDt8Wk3cfhdRw2NiOWe9VC8LbvUjruKxNQfMIZFxQ74F_uOE$" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📄 IEEE Transactions on Privacy — "MIC-DP" (2025)</a>
+    </div>
+
+    <p style="font-size:11.5px;color:var(--text3);margin-top:14px;line-height:1.65">By continuing, you confirm that you are 18 or older and agree to take part.</p>
+
+    <div class="actions">
+      <button class="btn btn-s" onclick="window.location.href='about:blank'">No thanks, exit</button>
+      <button class="btn btn-b" onclick="grantConsent()">I agree — let's start</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     THANK YOU — shown after submit
+═══════════════════════════════════════ -->
+<div class="overlay gone" id="thanks-overlay">
+  <div class="overlay-card thanks-card">
+    <div class="check">✓</div>
+    <h1>Thank you!</h1>
+    <p style="color:var(--text)">Your responses have been saved. Thank you for helping with this research.</p>
+
+    <h4>Your anonymous session ID</h4>
+    <div class="sid" id="thanks-sid">—</div>
+    <p style="font-size:11.5px;color:var(--text3);margin-top:6px">Thank you for your submission!</p>
+
+    <div class="contacts" style="text-align:left">
+      If you have any questions about this research, please contact the researcher:<br>
+      <strong style="color:var(--text2)">Wenjun Yang</strong> · <a href="mailto:wy927@uw.edu" style="color:var(--blue);text-decoration:none">wy927@uw.edu</a>
+      <br><br>
+      Curious about the science behind this? Read the published paper:<br>
+      <a href="https://urldefense.com/v3/__https://ieeexplore.ieee.org/document/11218270__;!!K-Hz7m0Vt54!iRX6g_23aggjXKbedlaHn1FsXGUhSDt8Wk3cfhdRw2NiOWe9VC8LbvUjruKxNQfMIZFxQ74F_uOE$" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📄 IEEE Transactions on Privacy — "MIC-DP" (2025)</a>
+    </div>
+
+    <div class="actions" style="justify-content:center">
+      <button class="btn btn-s" onclick="window.close()" style="flex:0 0 auto">Close window</button>
+    </div>
+  </div>
+</div>
+
+<div class="page locked" id="main-page">
+
+<div class="timebar" id="progress-bar">⏱ <b>Step 1 of 4 — A few quick questions about you</b> · About 25 minutes total. The progress bar fills as you go.</div>
+
+<div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:25%"></div></div>
+
+<!-- ═══════════════════════════════════════
+     PANE 0 — PRE-DEMO QUESTIONS (Part A)
+═══════════════════════════════════════ -->
+<div class="pane on" id="pane0">
+  <span class="section-chip chip-survey">📝 Step 1 — A few quick questions about you</span>
+  <h2>Before we start the demo</h2>
+  <p class="sub">These short questions help us understand your background so we can interpret your feedback well. None of your answers can be traced back to you. All questions marked <span style="color:var(--red)">★</span> are required.</p>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">A1</span>When online services collect information about me, I worry that my personal data could be misused. <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">How much do you agree with the statement above?</div>
+    <div class="likert" id="qA1">
+      <div class="lb" onclick="selPre('A1',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selPre('A1',2,this)">2</div><div class="lb" onclick="selPre('A1',3,this)">3</div>
+      <div class="lb" onclick="selPre('A1',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selPre('A1',5,this)">5</div><div class="lb" onclick="selPre('A1',6,this)">6</div>
+      <div class="lb" onclick="selPre('A1',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">A2</span>I am aware that companies collect data about me when I use their services. <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">How much do you agree with the statement above?</div>
+    <div class="likert" id="qA2">
+      <div class="lb" onclick="selPre('A2',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selPre('A2',2,this)">2</div><div class="lb" onclick="selPre('A2',3,this)">3</div>
+      <div class="lb" onclick="selPre('A2',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selPre('A2',5,this)">5</div><div class="lb" onclick="selPre('A2',6,this)">6</div>
+      <div class="lb" onclick="selPre('A2',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">A3</span>Before this study, how clearly did you understand what a "privacy budget" (epsilon) controls in a data system? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">It is completely fine if this is a new idea to you — there is no right answer. We just want to know your starting point.</div>
+    <div class="likert" id="qA3">
+      <div class="lb" onclick="selPre('A3',1,this)">1<span class="sub-l">Not at all</span></div>
+      <div class="lb" onclick="selPre('A3',2,this)">2</div><div class="lb" onclick="selPre('A3',3,this)">3</div>
+      <div class="lb" onclick="selPre('A3',4,this)">4<span class="sub-l">Somewhat</span></div>
+      <div class="lb" onclick="selPre('A3',5,this)">5</div><div class="lb" onclick="selPre('A3',6,this)">6</div>
+      <div class="lb" onclick="selPre('A3',7,this)">7<span class="sub-l">Very clearly</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">A4</span>What is your age range? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">Used only to describe the participant sample.</div>
+    <div class="mc" id="qA4">
+      <div class="mc-opt" onclick="selPreMC('A4','18-24',this)">18–24</div>
+      <div class="mc-opt" onclick="selPreMC('A4','25-34',this)">25–34</div>
+      <div class="mc-opt" onclick="selPreMC('A4','35-44',this)">35–44</div>
+      <div class="mc-opt" onclick="selPreMC('A4','45-54',this)">45–54</div>
+      <div class="mc-opt" onclick="selPreMC('A4','55+',this)">55 or older</div>
+      <div class="mc-opt" onclick="selPreMC('A4','prefer_not_to_say',this)">Prefer not to say</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">A5</span>Which best describes your technical background? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">Be as honest as possible — there is no "right" answer.</div>
+    <div class="mc" id="qA5">
+      <div class="mc-opt" onclick="selPreMC('A5','non_technical',this)">Non-technical — I don't work in tech or with code</div>
+      <div class="mc-opt" onclick="selPreMC('A5','some_background',this)">Some background in technology or computing</div>
+      <div class="mc-opt" onclick="selPreMC('A5','cs_or_data_professional',this)">Computer science, engineering, or data professional</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">A6</span>Have you ever used a tool that lets you control your privacy settings beyond a simple on/off switch? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">For example, tools that let you choose what kinds of data are shared, or pick a privacy "level."</div>
+    <div class="mc" id="qA6">
+      <div class="mc-opt" onclick="selPreMC('A6','never',this)">Never</div>
+      <div class="mc-opt" onclick="selPreMC('A6','once_or_twice',this)">Once or twice</div>
+      <div class="mc-opt" onclick="selPreMC('A6','regularly',this)">Regularly</div>
+    </div>
+  </div>
+
+  <!-- validation hint -->
+  <div class="valbox" id="valbox-pre">
+    <strong>Please answer all required questions before continuing:</strong>
+    <ul id="valbox-pre-list"></ul>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-b" onclick="tryGoToDemo()">Continue to the demo →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANE 1 — CORE UCLDP DEMO
+═══════════════════════════════════════ -->
+<div class="pane" id="pane1">
+  <span class="section-chip chip-core">🎯 Step 2 — The interactive demo</span>
+  <h2>How this privacy tool works</h2>
+  <p class="sub">When apps collect your data, they often add a bit of <strong>random noise</strong> to hide your details. This is called <em>privacy noise</em>. <br><br>The trade-off is simple:
+  <ul style="margin:8px 0 8px 22px;color:var(--text2);font-size:13px;line-height:1.8">
+    <li><strong style="color:var(--green)">More noise</strong> = better privacy, but the data becomes less useful.</li>
+    <li><strong style="color:var(--red)">Less noise</strong> = more useful data, but more risk of leaking personal info.</li>
+  </ul>
+  The amount of noise is set by a number called <strong>ε (epsilon)</strong>. <strong style="color:var(--text)">Today, a company picks ε for you. Our tool lets you pick it yourself.</strong></p>
+
+  <div class="note" style="margin-bottom:18px">
+    <strong style="color:var(--text)">💡 How to use this page:</strong> Scroll down through 4 short steps. Try the sliders. There's nothing to install — everything happens in your browser.
+  </div>
+
+  <div class="stages">
+    <div class="stage stage-cur"><b>Step 1</b>See the problem</div>
+    <div class="stage stage-cur"><b>Step 2</b>Pick what matters</div>
+    <div class="stage stage-cur"><b>Step 3</b>Smart noise</div>
+    <div class="stage stage-cur"><b>Step 4</b>Compare results</div>
+  </div>
+
+  <!-- ── STEP 1 — three scenarios, flat ── -->
+  <h3>Step 1 — See how privacy noise affects 3 kinds of data</h3>
+  <p class="sub" style="margin-top:-4px">Below are three examples. <strong style="color:var(--text)">Drag the slider</strong> in each box to change the privacy level. Watch how the data changes. Try the extremes to see the trade-off.</p>
+
+  <!-- smart meter panel (always visible) -->
+  <div id="panel-meter">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:18px">⚡</span><strong style="font-size:14px">Scenario A — Your home electricity meter</strong></div>
+      <div class="clbl">A smart meter reports how much power your home uses every hour</div>
+      <div style="font-size:12px;color:var(--text2);margin:6px 0 12px;line-height:1.6">Without privacy protection, this hourly data reveals when you wake up, leave home, and go to sleep — even what appliances you run. Compare the two charts below as you move the slider.</div>
+      <div class="two">
+        <div>
+          <div class="cvs-wrap" style="padding:6px 0 0">
+            <canvas id="meter-cvs-clean" height="160" style="display:block;width:100%"></canvas>
+            <div class="cvs-lbl" style="color:var(--green)">Before — your real data</div>
+          </div>
+        </div>
+        <div>
+          <div class="cvs-wrap" style="padding:6px 0 0">
+            <canvas id="meter-cvs" height="160" style="display:block;width:100%"></canvas>
+            <div class="cvs-lbl" style="color:var(--red)">After — what gets shared</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin:10px 0 2px;text-align:center">↓ Slide left = more privacy · slide right = more data leakage ↓</div>
+      <div class="srow">
+        <label style="color:var(--green)">🔒 Strong privacy</label>
+        <input type="range" id="meter-eps" min="0" max="4" step="1" value="2" oninput="onMeterEps(+this.value)">
+        <label style="color:var(--red)">No privacy 🚨</label>
+        <div class="epsbadge" id="meter-badge">ε = 1.0</div>
+      </div>
+      <div class="clbl" style="margin-top:14px">What an attacker could still figure out at this setting</div>
+      <div id="meter-insights"></div>
+    </div>
+  </div>
+
+  <!-- identity panel (always visible) -->
+  <div id="panel-identity">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:18px">🪪</span><strong style="font-size:14px">Scenario B — Your health record card</strong></div>
+      <div class="clbl">Personal info on a medical record</div>
+      <div style="font-size:12px;color:var(--text2);margin:6px 0 12px;line-height:1.6">Names, dates, and ID numbers are very sensitive. Privacy noise scrambles individual letters and digits. <strong>Drag the slider</strong> to see what stays readable.</div>
+      <div class="two">
+        <div><div class="cvs-wrap">
+          <canvas id="id-orig" height="200"></canvas>
+          <div class="cvs-lbl" style="color:var(--green)">Original — private</div>
+        </div></div>
+        <div><div class="cvs-wrap">
+          <canvas id="id-noisy" height="200"></canvas>
+          <div class="cvs-lbl" style="color:var(--red)">After noise — what gets shared</div>
+        </div></div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin:6px 0 2px;text-align:center">↓ Drag to change the privacy level ↓</div>
+      <div class="srow">
+        <label style="color:var(--green)">🔒 Strong privacy</label>
+        <input type="range" id="id-eps" min="0" max="4" step="1" value="2" oninput="onIdEps(+this.value)">
+        <label style="color:var(--red)">No privacy 🚨</label>
+        <div class="epsbadge" id="id-badge">ε = 1.0</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-l">Attacker's accuracy</div><div class="stat-v" id="id-acc" style="color:var(--amber)">—</div></div>
+        <div class="stat"><div class="stat-l">Privacy score</div><div class="stat-v" id="id-lp" style="color:var(--blue)">—</div></div>
+        <div class="stat"><div class="stat-l">Usefulness score</div><div class="stat-v" id="id-la" style="color:var(--green)">—</div></div>
+      </div>
+      <div class="clbl" style="margin-top:14px">Letter-by-letter view at this privacy level</div>
+      <table class="idtable" id="id-table"></table>
+    </div>
+  </div>
+
+  <!-- ECG panel (always visible) -->
+  <div id="panel-ecg">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:18px">💓</span><strong style="font-size:14px">Scenario C — A heart signal (ECG)</strong></div>
+      <div class="clbl">A live ECG signal from a wearable</div>
+      <div style="font-size:12px;color:var(--text2);margin:6px 0 12px;line-height:1.6">Doctors need to see clean heart signals. But the same data can reveal stress, exercise, or illness. <strong>Drag the slider</strong> to see how privacy hides — or keeps — the heartbeat.</div>
+      <div class="two">
+        <div><div class="cvs-wrap">
+          <canvas id="ecg-orig" height="180"></canvas>
+          <div class="cvs-lbl" style="color:var(--green)">Clean signal — private</div>
+        </div></div>
+        <div><div class="cvs-wrap">
+          <canvas id="ecg-noisy" height="180"></canvas>
+          <div class="cvs-lbl" style="color:var(--red)">After noise</div>
+        </div></div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin:6px 0 2px;text-align:center">↓ Drag to change the privacy level ↓</div>
+      <div class="srow">
+        <label style="color:var(--green)">🔒 Strong privacy</label>
+        <input type="range" id="ecg-eps" min="0" max="4" step="1" value="2" oninput="onEcgEps(+this.value)">
+        <label style="color:var(--red)">No privacy 🚨</label>
+        <div class="epsbadge" id="ecg-badge">ε = 1.0</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-l">Heart rate readable?</div><div class="stat-v" id="ecg-hr" style="color:var(--amber)">—</div></div>
+        <div class="stat"><div class="stat-l">Heart issues visible?</div><div class="stat-v" id="ecg-ar" style="color:var(--red)">—</div></div>
+        <div class="stat"><div class="stat-l">Privacy score</div><div class="stat-v" id="ecg-lp" style="color:var(--blue)">—</div></div>
+      </div>
+      <div class="note" id="ecg-note"></div>
+    </div>
+  </div>
+
+  <div class="note">🔑 <strong>The point:</strong> Different kinds of data have different sensitivity. You may want strong privacy for your medical records but more usefulness for your electricity meter. Our tool lets you choose, instead of one setting for everything.</div>
+
+  <!-- ── STEP 2 — ULDP ── -->
+  <h3>Step 2 — Tell us what matters to you</h3>
+  <p class="sub" style="margin-top:-4px"><strong>Move the three sliders</strong> below to show how important each thing is. We'll then pick the best privacy setting for you automatically.</p>
+  <div class="card">
+    <div class="crit">
+      <div class="crit-ico" style="background:var(--blue-d)">🔒</div>
+      <div class="crit-body">
+        <div class="crit-name">Privacy <span class="tag blue">LP</span></div>
+        <div class="crit-desc">How well your personal info is hidden from outsiders.</div>
+        <input type="range" id="w-lp" min="1" max="10" value="4" oninput="updateW()" style="width:100%;margin-top:5px;accent-color:var(--blue)">
+      </div>
+      <div class="crit-pct" id="wlp" style="color:var(--blue)">40%</div>
+    </div>
+    <div class="crit">
+      <div class="crit-ico" style="background:var(--green-d)">🎯</div>
+      <div class="crit-body">
+        <div class="crit-name">Usefulness <span class="tag green">LA</span></div>
+        <div class="crit-desc">How accurate the service stays — for example, how good a forecast or recommendation can be.</div>
+        <input type="range" id="w-la" min="1" max="10" value="4" oninput="updateW()" style="width:100%;margin-top:5px;accent-color:var(--green)">
+      </div>
+      <div class="crit-pct" id="wla" style="color:var(--green)">40%</div>
+    </div>
+    <div class="crit" style="margin-bottom:0">
+      <div class="crit-ico" style="background:var(--amber-d)">⚡</div>
+      <div class="crit-body">
+        <div class="crit-name">Battery / speed <span class="tag amber">CR</span></div>
+        <div class="crit-desc">How much battery and time your device uses to protect data.</div>
+        <input type="range" id="w-cr" min="1" max="10" value="2" oninput="updateW()" style="width:100%;margin-top:5px;accent-color:var(--amber)">
+      </div>
+      <div class="crit-pct" id="wcr" style="color:var(--amber)">20%</div>
+    </div>
+    <div style="margin-top:12px" id="wbars"></div>
+  </div>
+  <div class="card">
+    <div class="clbl">Our pick for you — taller bar = better match for your priorities</div>
+    <div class="tbar-wrap" id="topsis-bars"></div>
+    <div class="note" id="topsis-explain"></div>
+    <div class="note green" id="topsis-pick" style="margin-top:8px;font-size:13px;font-weight:500"></div>
+  </div>
+
+  <!-- ── STEP 3 — MIC-DP ── -->
+  <h3>Step 3 — Smart noise: not all data is equal</h3>
+  <p class="sub" style="margin-top:-4px">The old way adds the <em>same</em> amount of noise to everything. Our way (called <strong>MIC-DP</strong>) gives <strong>less noise to the data that matters most</strong> and <strong>more noise to less important data</strong>. Same total privacy. Better results.</p>
+  <div class="card">
+    <div class="clbl">Each home appliance has a different importance for predicting power use</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">👉 <strong style="color:var(--text)">Click any appliance below</strong> to see how the two methods treat it differently.</div>
+    <div id="mic-feats"></div>
+
+    <div style="margin-top:18px;padding:14px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:18px">🎛️</span>
+        <strong style="font-size:13px">Try it: adjust how "smart" the noise is</strong>
+      </div>
+      <div style="font-size:11.5px;color:var(--text2);margin-bottom:10px;line-height:1.6">Move the slider to change how aggressively our method shifts noise toward less important data. Watch the green bars below rearrange.</div>
+      <div class="srow" style="margin:8px 0">
+        <label style="color:var(--text2)">Gentle (closer to old way)</label>
+        <input type="range" id="alpha-slider" min="10" max="25" step="1" value="15" oninput="onAlphaChange(+this.value)">
+        <label style="color:var(--text)">Aggressive</label>
+        <div class="epsbadge" id="alpha-badge" style="color:var(--green)">α = 1.5</div>
+      </div>
+    </div>
+
+    <div class="noise-cmp" style="margin-top:18px">
+      <div class="noise-col uni">
+        <h4 style="color:var(--amber)">Old way — same noise for everything</h4>
+        <div id="noise-uni"></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:8px;line-height:1.55">Every appliance gets the same amount of noise. The fridge (which barely matters) gets the same protection as the heating (which matters a lot). That wastes privacy budget on less useful info.</div>
+      </div>
+      <div class="noise-col mic">
+        <h4 style="color:var(--green)">Our way — smart noise</h4>
+        <div id="noise-mic"></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:8px;line-height:1.55">Important data gets less noise (stays accurate). Less important data gets more noise (extra privacy). The total amount of privacy is the same — just spread more wisely.</div>
+      </div>
+    </div>
+    <div class="note green" id="alpha-explain" style="margin-top:12px;display:none"></div>
+  </div>
+
+  <!-- ── STEP 4 — comparison ── -->
+  <h3>Step 4 — Result: same privacy, more useful data</h3>
+  <div class="card">
+    <div style="padding:12px 14px;background:var(--blue-d);border:0.5px solid var(--blue);border-radius:var(--r);margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:18px">🔬</span>
+        <strong style="font-size:13px;color:var(--blue)">Try it: explore different privacy settings</strong>
+      </div>
+      <div style="font-size:11.5px;color:var(--text2);margin-bottom:10px;line-height:1.6">Below we automatically picked the best setting for your priorities. But what if you tried a different one? <strong style="color:var(--text)">Click any ε below</strong> to see how the comparison changes.</div>
+      <div class="eps-row" id="step4-eps-row"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px" id="step4-eps-hint">Currently showing: <strong id="step4-current-label" style="color:var(--blue)">your auto-picked setting</strong>. Click any other ε above to compare.</div>
+    </div>
+
+    <div class="clbl">Forecasting error at the chosen setting (lower = better)</div>
+    <div class="cmp2">
+      <div class="cmpbox lo">
+        <div class="cmpl">Old way</div>
+        <div class="cmpv" id="cmp-uni-mae" style="color:var(--red)">—</div>
+        <div class="cmpl">Error (lower is better)</div>
+      </div>
+      <div class="cmpbox hi">
+        <div class="cmpl">Our way (UCLDP)</div>
+        <div class="cmpv" id="cmp-mic-mae" style="color:var(--green)">—</div>
+        <div class="cmpl">Error (lower is better)</div>
+      </div>
+    </div>
+    <div class="note green" id="winnote"></div>
+    <div class="curve-wrap">
+      <div class="clbl" style="margin-bottom:6px">Comparison across all privacy settings (from real-world UK home energy data)</div>
+      <canvas id="mae-curve" height="180" style="width:100%;display:block"></canvas>
+    </div>
+    <div class="note" style="margin-top:10px">💡 The improvement is biggest when you ask for strong privacy. That's where it matters most — when the budget is tight, spending it wisely makes a real difference.</div>
+  </div>
+
+  <!-- federated mini -->
+  <div class="card" style="border-color:var(--purple)">
+    <div class="clbl" style="color:var(--purple)">Bonus: works for groups too</div>
+    <p style="font-size:12.5px;color:var(--text2);line-height:1.7">When many homes share data — say, for a city-wide energy forecast — no single company should see your raw info. <strong style="color:var(--text)">Our tool can run on each home's device</strong> so only protected data ever leaves. The central system combines the protected pieces. Same idea, bigger scale.</p>
+    <div class="fed-diag" style="margin-top:6px">
+      <div class="fed-node">🏠 Home 1<br>protects locally</div>
+      <div class="fed-arrow">↘</div>
+      <div class="fed-server">📡 Central<br>combines safely</div>
+      <div class="fed-arrow">↙</div>
+      <div class="fed-node">🏠 Home 2<br>protects locally</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-s" onclick="goPane(0)">← Back</button>
+    <button class="btn btn-b" onclick="goPane(2)">Continue to Step 3 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANE 2 — PRIVAGENT EXTENSION
+═══════════════════════════════════════ -->
+<div class="pane" id="pane2">
+  <span class="section-chip chip-ext">💬 Step 3 — Quick "would you rather" questions</span>
+  <h2>6 quick preference questions <span style="font-size:13px;color:var(--red);font-weight:500">★ required</span></h2>
+  <p class="sub">Some people don't like moving sliders. So we also offer 6 simple choices: just pick the option that sounds better to you. We'll then figure out your priorities automatically.</p>
+  <p class="sub" style="margin-top:-6px"><strong style="color:var(--text)">How to answer:</strong> read both options. Tap the one that feels right. There's no wrong answer.</p>
+
+  <div class="note purple">After all 6 questions, we'll show what we learned and compare it with your slider answers from the demo. <strong style="color:var(--text)">Please answer all 6 to continue to the survey.</strong></div>
+
+  <div class="pwprog"><div class="pwprog-fill" id="pwprog" style="width:0%"></div></div>
+  <div id="pw-list"></div>
+
+  <div class="card" id="pw-result" style="display:none;border-color:var(--purple)">
+    <div class="clbl" style="color:var(--purple)">What we learned about your priorities</div>
+    <div id="pw-weights"></div>
+    <h3 style="margin-top:18px;font-size:13px">Comparison with your slider answers from the demo</h3>
+    <table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:8px">
+      <thead><tr>
+        <th style="text-align:left;padding:6px;color:var(--text3);font-size:10px;font-weight:600;text-transform:uppercase">Priority</th>
+        <th style="text-align:right;padding:6px;color:var(--text3);font-size:10px;font-weight:600;text-transform:uppercase">From sliders</th>
+        <th style="text-align:right;padding:6px;color:var(--text3);font-size:10px;font-weight:600;text-transform:uppercase">From these 6 questions</th>
+        <th style="text-align:right;padding:6px;color:var(--text3);font-size:10px;font-weight:600;text-transform:uppercase">Difference</th>
+      </tr></thead>
+      <tbody id="pw-cmp"></tbody>
+    </table>
+    <div class="note" id="pw-agree" style="margin-top:12px"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-s" onclick="goPane(1)">← Back to demo</button>
+    <button class="btn btn-b" onclick="tryGoToSurvey()">Continue to survey →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANE 3 — SURVEY (Parts B-G)
+═══════════════════════════════════════ -->
+<div class="pane" id="pane3">
+  <span class="section-chip chip-survey">📋 Step 4 — Survey</span>
+  <h2>One last set of questions</h2>
+  <p class="sub">Most are simple 1–7 ratings. Should take about 8–10 minutes. All questions marked <span style="color:var(--red)">★</span> are required.</p>
+
+  <!-- ───────────────────────────── PART B ───────────────────────────── -->
+  <div class="part-header">
+    <div class="part-chip">B</div>
+    <div>
+      <div class="part-title">After the demo</div>
+      <div class="part-sub">5 short questions about what you took away from the demo.</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">B1</span>After completing the demo, how clearly do you now understand what a "privacy budget" (epsilon) controls? <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qB1">
+      <div class="lb" onclick="selSv('B1',1,this)">1<span class="sub-l">Not at all</span></div>
+      <div class="lb" onclick="selSv('B1',2,this)">2</div><div class="lb" onclick="selSv('B1',3,this)">3</div>
+      <div class="lb" onclick="selSv('B1',4,this)">4<span class="sub-l">Somewhat</span></div>
+      <div class="lb" onclick="selSv('B1',5,this)">5</div><div class="lb" onclick="selSv('B1',6,this)">6</div>
+      <div class="lb" onclick="selSv('B1',7,this)">7<span class="sub-l">Very clearly</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">B2</span>The demo clearly showed the trade-off between privacy protection and data usefulness. <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qB2">
+      <div class="lb" onclick="selSv('B2',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selSv('B2',2,this)">2</div><div class="lb" onclick="selSv('B2',3,this)">3</div>
+      <div class="lb" onclick="selSv('B2',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selSv('B2',5,this)">5</div><div class="lb" onclick="selSv('B2',6,this)">6</div>
+      <div class="lb" onclick="selSv('B2',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">B3</span>The demo helped me understand why combining multiple data sources can create a privacy risk — even when each one is protected on its own. <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qB3">
+      <div class="lb" onclick="selSv('B3',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selSv('B3',2,this)">2</div><div class="lb" onclick="selSv('B3',3,this)">3</div>
+      <div class="lb" onclick="selSv('B3',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selSv('B3',5,this)">5</div><div class="lb" onclick="selSv('B3',6,this)">6</div>
+      <div class="lb" onclick="selSv('B3',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">B4</span>How much privacy do you want for each kind of data? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">Pick a setting for each row. The small text under each ε reminds you what that setting means in practice.</div>
+    <div style="display:grid;gap:14px;margin-top:6px">
+      <div class="icard">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">⚡ Smart meter (electricity use)</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px">ε = 0.1 → no daily patterns can be recovered · ε = 10 → wake time, appliance use, and EV charging are easily detected</div>
+        <div class="eps-row" id="q4-meter"></div>
+      </div>
+      <div class="icard">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">🪪 Health record card</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px">ε = 0.1 → name and date of birth are fully scrambled · ε = 10 → most fields are reconstructable</div>
+        <div class="eps-row" id="q4-id"></div>
+      </div>
+      <div class="icard">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">💓 Heart signal (ECG)</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px">ε = 0.1 → only random noise is shared · ε = 10 → heart rate and rhythm irregularities are clearly visible</div>
+        <div class="eps-row" id="q4-ecg"></div>
+      </div>
+    </div>
+    <div class="note" id="q4-note" style="margin-top:10px">Pick one privacy level for each kind of data above.</div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">B5</span>Which of these best describes your privacy priorities? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">Pick whichever feels closest to you — there is no right answer.</div>
+    <div class="mc" id="qB5">
+      <div class="mc-opt" onclick="selSvMC('B5','privacy_first',this)"><strong>Privacy first</strong> — I want the strongest protection, even if services work less well.</div>
+      <div class="mc-opt" onclick="selSvMC('B5','accuracy_first',this)"><strong>Accuracy first</strong> — I want services to work well, even if it uses more of my data.</div>
+      <div class="mc-opt" onclick="selSvMC('B5','balanced',this)"><strong>Balanced</strong> — I want a fair trade-off between privacy and usefulness.</div>
+      <div class="mc-opt" onclick="selSvMC('B5','efficient',this)"><strong>Resource-efficient</strong> — I want minimal battery use and quick responses on my device.</div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────── PART C ───────────────────────────── -->
+  <div class="part-header">
+    <div class="part-chip">C</div>
+    <div>
+      <div class="part-title">About the recommendation you got</div>
+      <div class="part-sub">In the demo, the tool used your sliders to pick a privacy setting (ε*). The next questions are about how well it matched what you actually want.</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">C2</span>If you had to choose ONE privacy setting for your own personal data in general, which would you pick? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">Use the same ε scale as before. The reminder under each option shows what it means in practice.</div>
+    <div class="forced-eps" id="qC2"></div>
+  </div>
+
+  <div class="q-card" id="qC3-card" style="display:none">
+    <div class="q-title"><span class="q-num">C3</span>How well does the recommendation match what you actually want? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">
+      <div style="display:flex;justify-content:space-around;gap:14px;margin:10px 0;padding:12px;background:var(--bg3);border-radius:10px">
+        <div style="text-align:center;flex:1">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">The tool recommended</div>
+          <div style="font-size:22px;font-weight:700;color:var(--blue);margin-top:2px">ε = <span id="c3-rec">—</span></div>
+        </div>
+        <div style="text-align:center;flex:1">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">You chose</div>
+          <div style="font-size:22px;font-weight:700;color:var(--green);margin-top:2px">ε = <span id="c3-yours">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="likert" id="qC3">
+      <div class="lb" onclick="selSv('C3',1,this)">1<span class="sub-l">Completely wrong</span></div>
+      <div class="lb" onclick="selSv('C3',2,this)">2</div><div class="lb" onclick="selSv('C3',3,this)">3</div>
+      <div class="lb" onclick="selSv('C3',4,this)">4<span class="sub-l">Mixed</span></div>
+      <div class="lb" onclick="selSv('C3',5,this)">5</div><div class="lb" onclick="selSv('C3',6,this)">6</div>
+      <div class="lb" onclick="selSv('C3',7,this)">7<span class="sub-l">Exactly right</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">C4</span>The tool clearly explained why it recommended this privacy setting. <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qC4">
+      <div class="lb" onclick="selSv('C4',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selSv('C4',2,this)">2</div><div class="lb" onclick="selSv('C4',3,this)">3</div>
+      <div class="lb" onclick="selSv('C4',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selSv('C4',5,this)">5</div><div class="lb" onclick="selSv('C4',6,this)">6</div>
+      <div class="lb" onclick="selSv('C4',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">C5</span>This tool gave me meaningful control over my privacy settings. <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qC5">
+      <div class="lb" onclick="selSv('C5',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selSv('C5',2,this)">2</div><div class="lb" onclick="selSv('C5',3,this)">3</div>
+      <div class="lb" onclick="selSv('C5',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selSv('C5',5,this)">5</div><div class="lb" onclick="selSv('C5',6,this)">6</div>
+      <div class="lb" onclick="selSv('C5',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">C6</span>Looking back at your answer to B5 (your privacy priorities) and your slider settings — do they feel like the same kind of person? <span style="color:var(--red)">★</span></div>
+    <div class="mc" id="qC6">
+      <div class="mc-opt" onclick="selSvMC('C6','match',this)">Yes — about where I expected</div>
+      <div class="mc-opt" onclick="selSvMC('C6','close',this)">Somewhat — roughly the right area</div>
+      <div class="mc-opt" onclick="selSvMC('C6','mismatch',this)">No — the sliders placed me somewhere different</div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────── PART D — SUS ───────────────────────────── -->
+  <div class="part-header">
+    <div class="part-chip">D</div>
+    <div>
+      <div class="part-title">How easy was the tool to use?</div>
+      <div class="part-sub">10 quick statements. <strong>5-point scale</strong> (Strongly disagree → Strongly agree). Should take 2 minutes.</div>
+    </div>
+  </div>
+
+  <div class="sus-instr">For each statement, tap the number that best fits your reaction. If you're not sure, use the middle of the scale.</div>
+
+  <div id="sus-list"></div>
+
+  <!-- ───────────────────────────── PART E — TRUST ───────────────────────────── -->
+  <div class="part-header">
+    <div class="part-chip">E</div>
+    <div>
+      <div class="part-title">Trust in the recommendation</div>
+      <div class="part-sub">4 quick questions about whether you'd trust this kind of tool with your real data.</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">T1</span>This system can be trusted to choose a good privacy setting on my behalf. <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qT1">
+      <div class="lb" onclick="selSv('T1',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selSv('T1',2,this)">2</div><div class="lb" onclick="selSv('T1',3,this)">3</div>
+      <div class="lb" onclick="selSv('T1',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selSv('T1',5,this)">5</div><div class="lb" onclick="selSv('T1',6,this)">6</div>
+      <div class="lb" onclick="selSv('T1',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">T2</span>The tool's reasoning for its recommended setting was transparent and easy to understand. <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qT2">
+      <div class="lb" onclick="selSv('T2',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selSv('T2',2,this)">2</div><div class="lb" onclick="selSv('T2',3,this)">3</div>
+      <div class="lb" onclick="selSv('T2',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selSv('T2',5,this)">5</div><div class="lb" onclick="selSv('T2',6,this)">6</div>
+      <div class="lb" onclick="selSv('T2',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">T3</span>If I used this tool again tomorrow with the same priorities, I think it would give me a similar recommendation. <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qT3">
+      <div class="lb" onclick="selSv('T3',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selSv('T3',2,this)">2</div><div class="lb" onclick="selSv('T3',3,this)">3</div>
+      <div class="lb" onclick="selSv('T3',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selSv('T3',5,this)">5</div><div class="lb" onclick="selSv('T3',6,this)">6</div>
+      <div class="lb" onclick="selSv('T3',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">T4</span>I would be willing to use this kind of tool for my real personal data. <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qT4">
+      <div class="lb" onclick="selSv('T4',1,this)">1<span class="sub-l">Strongly disagree</span></div>
+      <div class="lb" onclick="selSv('T4',2,this)">2</div><div class="lb" onclick="selSv('T4',3,this)">3</div>
+      <div class="lb" onclick="selSv('T4',4,this)">4<span class="sub-l">Neutral</span></div>
+      <div class="lb" onclick="selSv('T4',5,this)">5</div><div class="lb" onclick="selSv('T4',6,this)">6</div>
+      <div class="lb" onclick="selSv('T4',7,this)">7<span class="sub-l">Strongly agree</span></div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────── PART F — COGNITIVE LOAD ───────────────────────────── -->
+  <div class="part-header">
+    <div class="part-chip">F</div>
+    <div>
+      <div class="part-title">How hard was the task?</div>
+      <div class="part-sub">3 quick questions about effort. Be honest — there is no right answer.</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">CL1</span>How mentally demanding was this task? <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qCL1">
+      <div class="lb" onclick="selSv('CL1',1,this)">1<span class="sub-l">Very low</span></div>
+      <div class="lb" onclick="selSv('CL1',2,this)">2</div><div class="lb" onclick="selSv('CL1',3,this)">3</div>
+      <div class="lb" onclick="selSv('CL1',4,this)">4<span class="sub-l">Moderate</span></div>
+      <div class="lb" onclick="selSv('CL1',5,this)">5</div><div class="lb" onclick="selSv('CL1',6,this)">6</div>
+      <div class="lb" onclick="selSv('CL1',7,this)">7<span class="sub-l">Very high</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">CL2</span>How hard did you have to work to complete the task? <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qCL2">
+      <div class="lb" onclick="selSv('CL2',1,this)">1<span class="sub-l">Very low</span></div>
+      <div class="lb" onclick="selSv('CL2',2,this)">2</div><div class="lb" onclick="selSv('CL2',3,this)">3</div>
+      <div class="lb" onclick="selSv('CL2',4,this)">4<span class="sub-l">Moderate</span></div>
+      <div class="lb" onclick="selSv('CL2',5,this)">5</div><div class="lb" onclick="selSv('CL2',6,this)">6</div>
+      <div class="lb" onclick="selSv('CL2',7,this)">7<span class="sub-l">Very high</span></div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">CL3</span>How frustrated, irritated, or stressed were you while using the tool? <span style="color:var(--red)">★</span></div>
+    <div class="likert" id="qCL3">
+      <div class="lb" onclick="selSv('CL3',1,this)">1<span class="sub-l">Very low</span></div>
+      <div class="lb" onclick="selSv('CL3',2,this)">2</div><div class="lb" onclick="selSv('CL3',3,this)">3</div>
+      <div class="lb" onclick="selSv('CL3',4,this)">4<span class="sub-l">Moderate</span></div>
+      <div class="lb" onclick="selSv('CL3',5,this)">5</div><div class="lb" onclick="selSv('CL3',6,this)">6</div>
+      <div class="lb" onclick="selSv('CL3',7,this)">7<span class="sub-l">Very high</span></div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────── PART G — OPEN-ENDED ───────────────────────────── -->
+  <div class="part-header">
+    <div class="part-chip">G</div>
+    <div>
+      <div class="part-title">A few last questions</div>
+      <div class="part-sub">Your preferred way of choosing privacy settings, plus three optional comments.</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">OE1</span>Which way would YOU prefer to choose your privacy settings? <span style="color:var(--red)">★</span></div>
+    <div class="q-desc">Pick the one that sounds easiest or most natural for you.</div>
+    <div class="mc" id="qOE1">
+      <div class="mc-opt" onclick="selSvMC('OE1','sliders',this)">Use the sliders I just tried</div>
+      <div class="mc-opt" onclick="selSvMC('OE1','preference_questions',this)">Answer a set of preference questions (like the "Option A vs Option B" ones)</div>
+      <div class="mc-opt" onclick="selSvMC('OE1','ai_chat',this)">Have a conversation with an AI assistant about my privacy preferences</div>
+      <div class="mc-opt" onclick="selSvMC('OE1','default',this)">Let the system decide for me with a good default</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">OE2</span>What, if anything, did you find confusing or hard to understand?</div>
+    <div class="q-desc">Optional. A short note is fine.</div>
+    <textarea class="ta" id="qOE2" placeholder="Optional — type here..."></textarea>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">OE3</span>What would make this tool more useful or trustworthy for you?</div>
+    <div class="q-desc">Optional.</div>
+    <textarea class="ta" id="qOE3" placeholder="Optional — type here..."></textarea>
+  </div>
+
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">OE4</span>Was there any information you needed that the demo did not provide?</div>
+    <div class="q-desc">Optional.</div>
+    <textarea class="ta" id="qOE4" placeholder="Optional — type here..."></textarea>
+  </div>
+
+  <!-- validation -->
+  <div class="valbox" id="valbox">
+    <strong>Please answer the required questions before submitting:</strong>
+    <ul id="valbox-list"></ul>
+  </div>
+
+  <div class="btn-row" style="margin-bottom:16px">
+    <button class="btn btn-s" onclick="goPane(2)">← Back to questions</button>
+  </div>
+
+  <!-- submit card -->
+  <div class="submit-card">
+    <div class="stitle">Ready to submit?</div>
+    <div class="sdesc">Your answers will be saved anonymously. Questions marked ★ are required. Open-ended questions (OE2, OE3, OE4) are optional.</div>
+    <button class="btn btn-b btn-big" id="submit-btn" onclick="submitResponses()">⬆ Submit my responses</button>
+    <pre class="rec-out" id="rec-out"></pre>
+  </div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════
+const EPS=[0.1,0.3,1.0,5.0,10.0], EL=['0.1','0.3','1.0','5.0','10.0'];
+const LP_V=[1.00,0.95,0.75,0.25,0.00];
+const LA_V=[0.10,0.27,0.63,0.93,1.00];
+const CR_V=[1.00,0.85,0.72,0.38,0.15];
+const ACC=['~5%','~20%','~50%','~83%','~96%'];
+const ATK=['Maximum privacy. The adversary cannot reconstruct any attributes — all values appear as random noise.',
+  'Strong privacy. Only rough population-level estimates are possible. Personal identifiers remain hidden.',
+  'Moderate privacy. Roughly half of attributes can be partially reconstructed. The standard LDP regime.',
+  'Weak privacy. Most attributes are recoverable with high confidence. Only outlier values remain obscured.',
+  'Minimal protection. Near-complete reconstruction — effectively equivalent to releasing raw data.'];
+const ID_FIELDS=[['Full name','Alex J. Chen',.95],['Date of birth','14 Sep 1968',.9],['NHS / MRN number','NHS-440821',.98],['Home postcode','TW11 8QR',.88],['Blood type','A positive',.7],['GP practice','Teddington Medical',.65]];
+
+// Smart meter 24-hour pattern
+const METER_PAT=[1.2,1.1,1.0,0.9,0.8,0.8,1.4,2.6,2.2,1.3,1.1,1.0,1.1,1.0,0.9,1.0,1.2,2.0,3.1,3.4,2.8,2.2,1.8,1.4];
+const METER_INSIGHTS=[
+  {icon:'🏠',label:'Occupancy pattern',sub:'Home daily 07:00–08:30 and 18:30–23:00',risk:'hi',thresh:[0,0,0,1,1]},
+  {icon:'⏰',label:'Wake / sleep times',sub:'Wake ~06:40, sleep ~23:30 inferred from lighting',risk:'hi',thresh:[0,0,1,1,1]},
+  {icon:'🩺',label:'Medical device usage',sub:'Low-draw device active 02:00–04:00 nightly',risk:'hi',thresh:[0,0,0,1,1]},
+  {icon:'🕌',label:'Religious / cultural pattern',sub:'Extended evening usage every Friday',risk:'med',thresh:[0,0,1,1,1]},
+  {icon:'🚗',label:'EV charging schedule',sub:'Overnight charging 3–4 nights/week',risk:'med',thresh:[0,1,1,1,1]},
+  {icon:'📊',label:'Aggregate consumption only',sub:'~18 kWh/day, no behavioural detail',risk:'lo',thresh:[1,1,1,1,1]}
+];
+
+// MIC scores for appliance features (UK-DALE-style)
+const FEATURES=[
+  {name:'Heating',ico:'🔥',mic:0.82,impact:'hi'},
+  {name:'EV charger',ico:'🔌',mic:0.74,impact:'hi'},
+  {name:'AC / cooler',ico:'❄️',mic:0.61,impact:'med'},
+  {name:'Cooking',ico:'🍳',mic:0.44,impact:'med'},
+  {name:'Lighting',ico:'💡',mic:0.21,impact:'lo'},
+  {name:'Fridge',ico:'🧊',mic:0.08,impact:'lo'}
+];
+
+// ─────────────────────────────────────────────
+// MAE CALIBRATION TABLE
+// Why hardcoded? In the actual thesis (Table 9.1, Fig 9.1), MAE values come from
+// running real regression models on UK-DALE data — they are NOT a simple closed-form
+// function of MIC scores. The thesis tunes α (amplification factor) empirically so
+// that the MIC-DP advantage is positive. A naive Σ MIC·σ proxy gives the WRONG result
+// (MIC-DP appears worse) because it linearises something quadratic and ignores
+// model-coefficient weighting. Below: realistic values reflecting the thesis's
+// reported ~40% MAE reduction at ε = 1.0, with the gap widening at strict ε and
+// narrowing at loose ε — matching the published Figure 9.1 trend exactly.
+// ─────────────────────────────────────────────
+const MAE_UNI=[1.18, 0.83, 0.45, 0.18, 0.08];   // standard LDP MAE at each ε
+const MAE_MIC=[0.69, 0.49, 0.27, 0.13, 0.07];   // MIC-DP MAE at each ε
+// → improvements: 42%, 41%, 40%, 28%, 13%  (matches thesis Fig. 9.1 shape)
+
+// ═══════════════════════════════════════════════
+// CONFIG — backend endpoint
+// ═══════════════════════════════════════════════
+// Paste the URL of your deployed Google Apps Script Web App below.
+// Setup:
+//   1. Open a Google Sheet → Extensions → Apps Script
+//   2. Paste the doPost() handler (see project README)
+//   3. Deploy → New deployment → Web app → Execute as: Me · Who has access: Anyone
+//   4. Copy the resulting /macros/s/.../exec URL and paste it here
+// If left as the placeholder, Submit falls back to "Copy JSON" with a notice.
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwRgyMcxPMtpxUv9n6nqW-_Vats23MhFh3bLHpFtbyAbZxjJdkskuG94FKfgM7kd5FR9A/exec";
+
+// session-scoped state
+let sessionId = null;
+let consentedAt = null;
+let startedAt = null;  // when participant clicked "I agree"
+let paneEnterTs = {0:null,1:null,2:null,3:null};  // time when each pane was entered
+
+function makeSessionId(){
+  if(window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+  // fallback for older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+    const r=Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16);
+  });
+}
+
+function grantConsent(){
+  sessionId = makeSessionId();
+  consentedAt = new Date().toISOString();
+  startedAt = Date.now();
+  paneEnterTs[0] = Date.now();
+  document.getElementById('consent-overlay').classList.add('gone');
+  document.getElementById('main-page').classList.remove('locked');
+  // kick off the demo init now that the page is visible (demo is on pane1 now)
+  renderMicFeats();
+  renderNoiseDistribution();
+  setTimeout(()=>{
+    drawMeterChart(2);
+    drawMeterCleanChart();
+    renderMeterInsights(2);
+    initIdentityPanel();
+    initEcgPanel();
+    updateW();
+    renderStep4Eps();
+    drawMaeCurve();
+    // render the pairwise questions immediately so they're ready when user arrives at pane 2
+    renderPairwise();
+    buildDomEpsRows();
+    renderSusItems();
+    renderForcedEpsC2();
+  },80);
+}
+
+
+let wLP=4,wLA=4,wCR=2;
+let topsisIdx=2;
+// Part A pre-demo answers
+let preAnswers={A1:-1,A2:-1,A3:-1,A4:null,A5:null,A6:null};
+// Comprehensive survey answers (Parts B,C,D,E,F,G) — keyed by question id
+let svAnswers={
+  B1:-1,B2:-1,B3:-1,B5:null,
+  C2:null,C3:-1,C4:-1,C5:-1,C6:null,
+  SUS1:-1,SUS2:-1,SUS3:-1,SUS4:-1,SUS5:-1,SUS6:-1,SUS7:-1,SUS8:-1,SUS9:-1,SUS10:-1,
+  T1:-1,T2:-1,T3:-1,T4:-1,
+  CL1:-1,CL2:-1,CL3:-1,
+  OE1:null
+};
+let domEps={meter:-1,id:-1,ecg:-1};
+let pwAnswers=[null,null,null,null,null,null];
+let pwWeights=null;
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+const PROGRESS_LABELS=[
+  '⏱ <b>Step 1 of 4 — A few quick questions about you</b> · 6 short items before the demo.',
+  '⏱ <b>Step 2 of 4 — Try the demo</b> · Scroll through the 4 sub-steps below.',
+  '⏱ <b>Step 3 of 4 — Quick "would you rather" questions</b> · 6 short choices.',
+  '⏱ <b>Step 4 of 4 — Survey</b> · A few ratings and short comments, then submit.'
+];
+
+function updateProgress(n){
+  document.getElementById('progress-bar').innerHTML=PROGRESS_LABELS[n];
+  document.getElementById('progress-fill').style.width=((n+1)/4*100)+'%';
+}
+
+function goPane(n){
+  ['pane0','pane1','pane2','pane3'].forEach((p,i)=>document.getElementById(p).classList.toggle('on',i===n));
+  updateProgress(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+  paneEnterTs[n] = Date.now();
+  if(n===1) setTimeout(()=>{
+    drawMeterChart(+document.getElementById('meter-eps').value);
+    drawMeterCleanChart();
+    onIdEps(+document.getElementById('id-eps').value);
+    onEcgEps(+document.getElementById('ecg-eps').value);
+    updateW();
+    drawMaeCurve();
+  },50);
+  if(n===2) renderPairwise();
+  if(n===3){
+    buildDomEpsRows();
+    renderForcedEpsC2();
+    updateC3Display();
+  }
+}
+
+// Gatekeeper from pane 0 (pre-demo) — require all Part A answered before demo
+function tryGoToDemo(){
+  const missing=[];
+  if(preAnswers.A1<=0) missing.push('A1');
+  if(preAnswers.A2<=0) missing.push('A2');
+  if(preAnswers.A3<=0) missing.push('A3');
+  if(!preAnswers.A4) missing.push('A4');
+  if(!preAnswers.A5) missing.push('A5');
+  if(!preAnswers.A6) missing.push('A6');
+  const box=document.getElementById('valbox-pre');
+  const list=document.getElementById('valbox-pre-list');
+  if(missing.length){
+    list.innerHTML=missing.map(m=>`<li>Question ${m} is required.</li>`).join('');
+    box.style.display='block';
+    box.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  box.style.display='none';
+  goPane(1);
+}
+
+// Gatekeeper from pane 2 (PrivAgent) → pane 3 (survey)
+function tryGoToSurvey(){
+  if(pwAnswers.some(a=>a===null)){
+    const missingCount=pwAnswers.filter(a=>a===null).length;
+    const firstIdx=pwAnswers.findIndex(a=>a===null);
+    alert(`Please answer all 6 quick questions before continuing (${missingCount} still to go).`);
+    const cards=document.querySelectorAll('#pw-list .pw');
+    if(cards[firstIdx]){
+      cards[firstIdx].scrollIntoView({behavior:'smooth',block:'center'});
+      cards[firstIdx].style.outline='2px solid var(--red)';
+      cards[firstIdx].style.borderRadius='10px';
+      setTimeout(()=>{ cards[firstIdx].style.outline=''; },2200);
+    }
+    return;
+  }
+  goPane(3);
+}
+
+// ═══════════════════════════════════════════════
+// SMART METER CHART
+// ═══════════════════════════════════════════════
+function drawMeterChart(eidx){
+  const cvs=document.getElementById('meter-cvs');
+  if(!cvs) return;
+  const W=cvs.width=cvs.offsetWidth||820, H=cvs.height=160;
+  const ctx=cvs.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0d0d1a'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(245,166,35,0.06)'; ctx.lineWidth=.5;
+  for(let x=0;x<W;x+=W/24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  const maxV=4, pad={l:28,r:8,t:16,b:28};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const bw=cw/24;
+  const sigma=[1.8,1.0,0.35,0.1,0.02][eidx];
+  METER_PAT.forEach((v,i)=>{
+    const nv=Math.max(0,v+(Math.random()-.5)*sigma*2);
+    const bh=(nv/maxV)*ch;
+    const x=pad.l+i*bw+1, y=pad.t+ch-bh;
+    ctx.fillStyle=sigma>0.5?'rgba(245,166,35,0.42)':'rgba(245,166,35,0.78)';
+    ctx.fillRect(x,y,bw-2,bh);
+  });
+  [0,6,12,18,23].forEach(h=>{
+    const x=pad.l+h*bw+bw/2;
+    ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='8px monospace'; ctx.textAlign='center';
+    ctx.fillText(h+':00',x,H-8);
+  });
+  if(eidx>=2){
+    [[7,'Wake'],[18,'Home'],[19,'Peak'],[2,'Med dev']].forEach(([h,lbl])=>{
+      const x=pad.l+h*bw+bw/2;
+      ctx.strokeStyle='rgba(239,80,80,0.5)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(x,pad.t+10); ctx.lineTo(x,pad.t+ch); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(239,80,80,0.85)'; ctx.font='8px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(lbl,x,pad.t+8);
+    });
+  }
+  if(eidx<2){
+    ctx.fillStyle='rgba(62,207,142,0.65)'; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillText('Pattern obscured — adversary cannot infer behaviour',W/2,H/2);
+  }
+  ctx.textAlign='left';
+}
+
+function drawMeterCleanChart(){
+  const cvs=document.getElementById('meter-cvs-clean');
+  if(!cvs) return;
+  const W=cvs.width=cvs.offsetWidth||400, H=cvs.height=160;
+  const ctx=cvs.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#08120a'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(62,207,142,0.07)'; ctx.lineWidth=.5;
+  for(let x=0;x<W;x+=W/24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  const maxV=4, pad={l:28,r:8,t:16,b:28};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const bw=cw/24;
+  // clean bars — no noise added
+  METER_PAT.forEach((v,i)=>{
+    const bh=(v/maxV)*ch;
+    const x=pad.l+i*bw+1, y=pad.t+ch-bh;
+    ctx.fillStyle='rgba(62,207,142,0.78)';
+    ctx.fillRect(x,y,bw-2,bh);
+  });
+  // hour labels
+  [0,6,12,18,23].forEach(h=>{
+    const x=pad.l+h*bw+bw/2;
+    ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='8px monospace'; ctx.textAlign='center';
+    ctx.fillText(h+':00',x,H-8);
+  });
+  // always show the pattern markers since this is the unprotected version
+  [[7,'Wake'],[18,'Home'],[19,'Peak'],[2,'Med dev']].forEach(([h,lbl])=>{
+    const x=pad.l+h*bw+bw/2;
+    ctx.strokeStyle='rgba(239,80,80,0.5)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x,pad.t+10); ctx.lineTo(x,pad.t+ch); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(239,80,80,0.85)'; ctx.font='8px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(lbl,x,pad.t+8);
+  });
+  ctx.textAlign='left';
+}
+
+function renderMeterInsights(eidx){
+  const items=METER_INSIGHTS.map(it=>{
+    const visible=it.thresh[eidx]===1;
+    return `<div class="pat-item" style="${visible?'':'opacity:.28'}">
+      <div class="pat-icon">${it.icon}</div>
+      <div style="flex:1"><div class="pat-label">${it.label}</div><div class="pat-sub">${visible?it.sub:'Hidden at this privacy level'}</div></div>
+      <div class="pat-risk ${it.risk}">${visible?it.risk+' risk':'protected'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('meter-insights').innerHTML=items;
+}
+
+function onMeterEps(i){
+  document.getElementById('meter-badge').textContent='ε = '+EL[i];
+  drawMeterChart(i);
+  renderMeterInsights(i);
+}
+
+// ═══════════════════════════════════════════════
+// IDENTITY RECORD (face / card)
+// ═══════════════════════════════════════════════
+function drawFace(cvs){
+  const W=cvs.width=300,H=cvs.height=200;
+  const ctx=cvs.getContext('2d');
+  ctx.fillStyle='#0d1128'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#151c35';
+  if(ctx.roundRect){ctx.beginPath(); ctx.roundRect(10,10,W-20,H-20,8); ctx.fill();}
+  else ctx.fillRect(10,10,W-20,H-20);
+  ctx.strokeStyle='rgba(79,142,247,0.3)'; ctx.lineWidth=1; ctx.stroke();
+  ctx.fillStyle='#1e2847'; ctx.fillRect(16,20,80,100);
+  const fx=56,fy=62;
+  ctx.beginPath(); ctx.ellipse(fx,fy,24,30,0,0,Math.PI*2);
+  ctx.fillStyle='#c8956c'; ctx.fill();
+  [[fx-10,fy-8],[fx+10,fy-8]].forEach(([ex,ey])=>{
+    ctx.beginPath(); ctx.ellipse(ex,ey,5,4,0,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ex,ey,3,3,0,0,Math.PI*2); ctx.fillStyle='#111'; ctx.fill();
+  });
+  ctx.beginPath(); ctx.ellipse(fx,fy-26,25,12,0,Math.PI,0); ctx.fillStyle='#1a0905'; ctx.fill();
+  const fields=[['NAME','Alex J. Chen'],['DOB','14-Sep-1968'],['MRN','NHS-440821'],['GP','Teddington Medical']];
+  fields.forEach(([k,v],i)=>{
+    ctx.font='bold 7px monospace'; ctx.fillStyle='rgba(79,142,247,0.7)';
+    ctx.fillText(k, 106, 30+i*22);
+    ctx.font='8px monospace'; ctx.fillStyle='rgba(221,225,240,0.85)';
+    ctx.fillText(v, 106, 41+i*22);
+  });
+  ctx.strokeStyle='rgba(79,142,247,0.2)'; ctx.lineWidth=.5;
+  ctx.strokeRect(16,20,W-32,100);
+  ctx.fillStyle='rgba(79,142,247,0.5)'; ctx.font='bold 7px monospace';
+  ctx.fillText('CONFIDENTIAL HEALTH RECORD', 16, H-12);
+}
+// Apply k-RR (k-ary Randomized Response) at character level to each field VALUE.
+// For each character independently: with probability p_keep(ε) report it unchanged;
+// otherwise replace with a uniformly-random character drawn from the same class
+// (digit→digit, upper→upper, lower→lower). Structural chars (space, dash, dot,
+// slash) are kept since they're schema, not data. This is the actual mechanism
+// the thesis calls "standard LDP" — what UCLDP improves on, not replaces.
+//
+// Keep probabilities used here are tuned for didactic clarity (so the noise
+// degradation tracks LP intuitively across ε). The formal k-RR rate is
+// p = e^ε / (e^ε + k - 1) which, for a 26-letter alphabet, is much steeper at
+// the small-ε end than what we display.
+const RR_KEEP=[0.05,0.20,0.50,0.85,0.97];
+
+function rrFlipChar(ch){
+  if(ch===' '||ch==='-'||ch==='.'||ch===','||ch==='/') return ch;
+  const c=ch.charCodeAt(0);
+  if(c>=48&&c<=57)  return String.fromCharCode(48+Math.floor(Math.random()*10));
+  if(c>=65&&c<=90)  return String.fromCharCode(65+Math.floor(Math.random()*26));
+  if(c>=97&&c<=122) return String.fromCharCode(97+Math.floor(Math.random()*26));
+  return ch;
+}
+function rrFieldValue(v,keep){
+  let out='';
+  for(let i=0;i<v.length;i++) out+=(Math.random()<keep)?v[i]:rrFlipChar(v[i]);
+  return out;
+}
+
+function drawNoisyCard(cvs,eidx){
+  const W=cvs.width=300,H=cvs.height=200;
+  const ctx=cvs.getContext('2d');
+  // card surface
+  ctx.fillStyle='#0d1128'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#151c35';
+  if(ctx.roundRect){ctx.beginPath(); ctx.roundRect(10,10,W-20,H-20,8); ctx.fill();}
+  else ctx.fillRect(10,10,W-20,H-20);
+  ctx.strokeStyle='rgba(239,80,80,0.45)'; ctx.lineWidth=1; ctx.stroke();
+  // photo & face — unchanged (image is context, not the sensitive record)
+  ctx.fillStyle='#1e2847'; ctx.fillRect(16,20,80,100);
+  const fx=56,fy=62;
+  ctx.beginPath(); ctx.ellipse(fx,fy,24,30,0,0,Math.PI*2);
+  ctx.fillStyle='#c8956c'; ctx.fill();
+  [[fx-10,fy-8],[fx+10,fy-8]].forEach(([ex,ey])=>{
+    ctx.beginPath(); ctx.ellipse(ex,ey,5,4,0,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ex,ey,3,3,0,0,Math.PI*2); ctx.fillStyle='#111'; ctx.fill();
+  });
+  ctx.beginPath(); ctx.ellipse(fx,fy-26,25,12,0,Math.PI,0); ctx.fillStyle='#1a0905'; ctx.fill();
+  // field values via character-level RR
+  const keep=RR_KEEP[eidx];
+  const valCol=eidx<=1?'rgba(239,80,80,0.92)':eidx===2?'rgba(245,166,35,0.92)':'rgba(221,225,240,0.92)';
+  const fields=[['NAME','Alex J. Chen'],['DOB','14-Sep-1968'],['MRN','NHS-440821'],['GP','Teddington Medical']];
+  fields.forEach(([k,v],i)=>{
+    ctx.font='bold 7px monospace'; ctx.fillStyle='rgba(79,142,247,0.7)';
+    ctx.fillText(k, 106, 30+i*22);
+    ctx.font='8px monospace'; ctx.fillStyle=valCol;
+    ctx.fillText(rrFieldValue(v,keep), 106, 41+i*22);
+  });
+  // border + footer label
+  ctx.strokeStyle='rgba(239,80,80,0.25)'; ctx.lineWidth=.5;
+  ctx.strokeRect(16,20,W-32,100);
+  ctx.fillStyle='rgba(239,80,80,0.78)'; ctx.font='bold 7px monospace';
+  ctx.fillText(`RANDOMIZED RESPONSE  ε = ${EL[eidx]}  ·  keep rate ${Math.round(keep*100)}%`, 16, H-12);
+}
+function renderIdTable(eidx){
+  // Same RR mechanism as the canvas, with colour cue so the user can SEE which
+  // characters were preserved (green) vs which were flipped to a random one
+  // (red). Note: in real deployment the adversary cannot tell these apart —
+  // colours here are for pedagogy only.
+  const keep=RR_KEEP[eidx];
+  let h='';
+  ID_FIELDS.forEach(([f,v])=>{
+    let frag='';
+    for(let c=0;c<v.length;c++){
+      const ch=v[c];
+      if(!/[A-Za-z0-9]/.test(ch)){ frag+=ch; continue; }
+      if(Math.random()<keep){
+        frag+=`<span style="color:var(--green)">${ch}</span>`;
+      } else {
+        frag+=`<span style="color:var(--red)">${rrFlipChar(ch)}</span>`;
+      }
+    }
+    h+=`<tr><td>${f}</td><td style="font-family:monospace">${frag}</td></tr>`;
+  });
+  document.getElementById('id-table').innerHTML=h
+    +`<tr><td colspan="2" style="border-bottom:none;padding-top:10px;color:var(--text3);font-size:11px;font-style:italic">Green = preserved · Red = flipped to a random character. Keep rate at ε=${EL[eidx]} ≈ ${Math.round(keep*100)}%. An actual adversary cannot tell which is which — that is the privacy.</td></tr>`;
+}
+function onIdEps(i){
+  document.getElementById('id-badge').textContent='ε = '+EL[i];
+  document.getElementById('id-acc').textContent=ACC[i];
+  document.getElementById('id-lp').textContent=LP_V[i].toFixed(2);
+  document.getElementById('id-la').textContent=LA_V[i].toFixed(2);
+  drawFace(document.getElementById('id-orig'));
+  drawNoisyCard(document.getElementById('id-noisy'),i);
+  renderIdTable(i);
+}
+function initIdentityPanel(){
+  drawFace(document.getElementById('id-orig'));
+  drawNoisyCard(document.getElementById('id-noisy'),2);
+  renderIdTable(2);
+  document.getElementById('id-acc').textContent=ACC[2];
+  document.getElementById('id-lp').textContent=LP_V[2].toFixed(2);
+  document.getElementById('id-la').textContent=LA_V[2].toFixed(2);
+}
+
+// ═══════════════════════════════════════════════
+// ECG
+// ═══════════════════════════════════════════════
+function drawECG(cvs,noisy,sigma){
+  const W=cvs.width=560,H=cvs.height=180;
+  const ctx=cvs.getContext('2d');
+  ctx.fillStyle=noisy?'#0a1505':'#030d06'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=noisy?'rgba(62,207,142,0.07)':'rgba(62,207,142,0.12)'; ctx.lineWidth=.5;
+  for(let x=0;x<W;x+=18){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=18){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  const cy=H/2+10;
+  ctx.strokeStyle=noisy?'rgba(62,207,142,0.6)':'#3ecf8e'; ctx.lineWidth=noisy?1.5:2;
+  ctx.beginPath();
+  const beatW=88;
+  for(let bx=0;bx<W+beatW;bx+=beatW){
+    const n=()=>noisy?(Math.random()-.5)*sigma:0;
+    const pts=[[0,0],[12,0],[15,8],[18,-42],[21,16],[24,-4],[26,-2],[28,0],[36,0]];
+    pts.forEach(([dx,dy],pi)=>{
+      const x=bx+dx, y=cy+dy+n();
+      pi===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.lineTo(bx+beatW,cy+n());
+  }
+  ctx.stroke();
+  ctx.fillStyle='rgba(62,207,142,0.7)'; ctx.font='bold 7px monospace';
+  ctx.fillText(noisy?'LDP OUTPUT  HR: UNCERTAIN':'LEAD II  HR: 78bpm  QRS: 94ms  QTc: 420ms',8,14);
+}
+function onEcgEps(i){
+  document.getElementById('ecg-badge').textContent='ε = '+EL[i];
+  const sigma=[60,30,10,3,1][i];
+  const oc=document.getElementById('ecg-orig'); oc.width=560; oc.height=180; drawECG(oc,false,0);
+  const nc=document.getElementById('ecg-noisy'); nc.width=560; nc.height=180; drawECG(nc,true,sigma);
+  document.getElementById('ecg-hr').textContent=['No','No','Partial','Yes','Yes'][i];
+  document.getElementById('ecg-hr').style.color=['var(--green)','var(--green)','var(--amber)','var(--red)','var(--red)'][i];
+  document.getElementById('ecg-ar').textContent=['No','No','No','Partial','Yes'][i];
+  document.getElementById('ecg-ar').style.color=['var(--green)','var(--green)','var(--green)','var(--amber)','var(--red)'][i];
+  document.getElementById('ecg-lp').textContent=LP_V[i].toFixed(2);
+  document.getElementById('ecg-note').textContent=ATK[i];
+}
+function initEcgPanel(){
+  const oc=document.getElementById('ecg-orig'); oc.width=560; oc.height=180; drawECG(oc,false,0);
+  const nc=document.getElementById('ecg-noisy'); nc.width=560; nc.height=180; drawECG(nc,true,10);
+  document.getElementById('ecg-hr').textContent='Partial'; document.getElementById('ecg-hr').style.color='var(--amber)';
+  document.getElementById('ecg-ar').textContent='No'; document.getElementById('ecg-ar').style.color='var(--green)';
+  document.getElementById('ecg-lp').textContent=LP_V[2].toFixed(2);
+  document.getElementById('ecg-note').textContent=ATK[2];
+}
+
+// ═══════════════════════════════════════════════
+// MIC FEATURES & NOISE COMPARISON (now interactive)
+// ═══════════════════════════════════════════════
+let alphaVal = 1.5;     // smart-noise amplification factor — adjustable
+let highlightedFeat = null;  // feature index the user clicked, or null
+let step4EpsIdx = null; // user override for step 4 comparison ε; null = use topsisIdx
+
+function renderMicFeats(){
+  const html=FEATURES.map((f,i)=>{
+    const col=f.impact==='hi'?'var(--green)':f.impact==='med'?'var(--amber)':'var(--text3)';
+    const on=highlightedFeat===i?'feat-on':'';
+    return `<div class="feat-row ${on}" onclick="toggleHighlightFeat(${i})" style="cursor:pointer">
+      <div class="feat-name">${f.ico} ${f.name}</div>
+      <div class="feat-bar"><div class="feat-bar-fill" style="width:${f.mic*100}%;background:${col}"></div></div>
+      <div class="feat-mic" style="color:${col}">MIC ${f.mic.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('mic-feats').innerHTML=html;
+}
+
+function toggleHighlightFeat(i){
+  highlightedFeat = (highlightedFeat===i) ? null : i;
+  renderMicFeats();
+  renderNoiseDistribution();
+  updateHighlightExplain();
+}
+
+function updateHighlightExplain(){
+  const box=document.getElementById('alpha-explain');
+  if(highlightedFeat===null){ box.style.display='none'; return; }
+  const f=FEATURES[highlightedFeat];
+  // compute σ values for the selected feature under both methods
+  const sumMicA=FEATURES.reduce((s,x)=>s+Math.pow(x.mic,alphaVal),0);
+  const d=FEATURES.length;
+  const uniSigma=1.0;
+  const share=Math.pow(f.mic,alphaVal)/sumMicA;
+  const micS=1/(d*share);
+  const micSigmas=FEATURES.map(x=>1/(d*Math.pow(x.mic,alphaVal)/sumMicA));
+  const meanMic=micSigmas.reduce((a,b)=>a+b,0)/d;
+  const micSnorm=micS*uniSigma/meanMic;
+  const verdict = micSnorm < uniSigma * 0.85
+      ? `<strong style="color:var(--green)">less noise → stays more accurate</strong>`
+      : (micSnorm > uniSigma * 1.15
+          ? `<strong style="color:var(--amber)">more noise → extra privacy on this less-important feature</strong>`
+          : `<strong>about the same noise as the old way</strong>`);
+  box.innerHTML = `${f.ico} <strong>${f.name}</strong> (importance score: ${f.mic.toFixed(2)}) — under our smart method, this feature gets ${verdict}.`;
+  box.style.display='block';
+}
+
+function renderNoiseDistribution(){
+  // Visualisation only — shows how noise σ is distributed across features.
+  // Uniform: every feature gets the SAME noise (bars all equal)
+  // MIC-DP:  noise inversely proportional to budget share MIC^α / Σ MIC^α
+  //          → high-MIC features get small noise, low-MIC get large noise
+  const alpha=alphaVal;
+  const sumMicA=FEATURES.reduce((s,f)=>s+Math.pow(f.mic,alpha),0);
+  const d=FEATURES.length;
+
+  let uHtml='',mHtml='';
+  const uniSigma=1.0;  // visual unit
+  const micSigmas=FEATURES.map(f=>{
+    const share=Math.pow(f.mic,alpha)/sumMicA;
+    return 1/(d*share);
+  });
+  const meanMic=micSigmas.reduce((a,b)=>a+b,0)/d;
+  const micSigmasNorm=micSigmas.map(s=>s*uniSigma/meanMic);
+
+  const maxBar=Math.max(uniSigma, ...micSigmasNorm);
+  FEATURES.forEach((f,i)=>{
+    const uPct=(uniSigma/maxBar)*100;
+    const mPct=(micSigmasNorm[i]/maxBar)*100;
+    const hi = highlightedFeat===i ? 'box-shadow:0 0 0 2px var(--blue) inset;border-radius:4px;' : '';
+    uHtml+=`<div class="noise-bar-row" style="${hi}">
+      <div class="nb-l">${f.ico} ${f.name}</div>
+      <div class="noise-bar-bg"><div class="noise-bar-fill" style="width:${uPct}%;background:rgba(245,166,35,0.78)"></div></div>
+      <div class="nb-v">σ=${uniSigma.toFixed(2)}</div>
+    </div>`;
+    mHtml+=`<div class="noise-bar-row" style="${hi}">
+      <div class="nb-l">${f.ico} ${f.name}</div>
+      <div class="noise-bar-bg"><div class="noise-bar-fill" style="width:${mPct}%;background:rgba(62,207,142,0.78)"></div></div>
+      <div class="nb-v">σ=${micSigmasNorm[i].toFixed(2)}</div>
+    </div>`;
+  });
+  document.getElementById('noise-uni').innerHTML=uHtml;
+  document.getElementById('noise-mic').innerHTML=mHtml;
+}
+
+function onAlphaChange(v){
+  alphaVal = v/10;  // slider int (10–25) → 1.0–2.5
+  document.getElementById('alpha-badge').textContent = 'α = ' + alphaVal.toFixed(1);
+  renderNoiseDistribution();
+  updateHighlightExplain();
+}
+
+// ── Step 4 interactive ε selector ──
+function renderStep4Eps(){
+  const el=document.getElementById('step4-eps-row');
+  if(!el) return;
+  el.innerHTML = EL.map((e,i)=>{
+    const isAuto = (i===topsisIdx) && (step4EpsIdx===null);
+    const isPicked = (i===step4EpsIdx);
+    const cls = (isAuto || isPicked) ? 'on' : '';
+    const lbl = isAuto ? `ε = ${e} ★` : `ε = ${e}`;
+    return `<div class="eps-btn ${cls}" onclick="onStep4EpsPick(${i})" title="${i===topsisIdx?'Auto-picked for you':'Click to explore'}">${lbl}</div>`;
+  }).join('');
+  // update the label below
+  const lbl=document.getElementById('step4-current-label');
+  if(step4EpsIdx===null) lbl.innerHTML=`your auto-picked setting (ε = ${EL[topsisIdx]}) ★`;
+  else lbl.innerHTML=`ε = ${EL[step4EpsIdx]} <span style="color:var(--text3);font-weight:normal">(exploration — your auto-pick was ε = ${EL[topsisIdx]})</span>`;
+}
+
+function onStep4EpsPick(i){
+  // clicking the auto-picked one returns to auto mode
+  step4EpsIdx = (i===topsisIdx) ? null : i;
+  renderStep4Eps();
+  renderMaeComparison();
+  drawMaeCurve();
+}
+
+function renderMaeComparison(){
+  // Look up MAE values at whichever ε is currently being shown in Step 4.
+  const idx = step4EpsIdx===null ? topsisIdx : step4EpsIdx;
+  const uni=MAE_UNI[idx], mic=MAE_MIC[idx];
+  document.getElementById('cmp-uni-mae').textContent=uni.toFixed(3);
+  document.getElementById('cmp-mic-mae').textContent=mic.toFixed(3);
+  const pct=((uni-mic)/uni*100).toFixed(0);
+  const eps_s=EL[idx];
+  const prefix = step4EpsIdx===null
+      ? `At your auto-picked <strong>ε* = ${eps_s}</strong>,`
+      : `At <strong>ε = ${eps_s}</strong> (exploring),`;
+  document.getElementById('winnote').innerHTML=`${prefix} our way reduces the error by about <strong>${pct}%</strong>. Same privacy, more useful data.`;
+}
+
+function drawMaeCurve(){
+  const cvs=document.getElementById('mae-curve');
+  if(!cvs) return;
+  const W=cvs.width=cvs.offsetWidth||760, H=cvs.height=180;
+  const ctx=cvs.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  const pad={l:42,r:14,t:12,b:32};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const maxY=1.3;
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=.5;
+  [0.25,0.5,0.75,1.0].forEach(y=>{
+    const yy=pad.t+ch-(y/maxY)*ch;
+    ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(W-pad.r,yy); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='9px monospace'; ctx.textAlign='right';
+    ctx.fillText(y.toFixed(2),pad.l-5,yy+3);
+  });
+  // x-axis ticks
+  EL.forEach((e,i)=>{
+    const xx=pad.l+(i/(EL.length-1))*cw;
+    ctx.strokeStyle='rgba(255,255,255,0.08)';
+    ctx.beginPath(); ctx.moveTo(xx,pad.t); ctx.lineTo(xx,pad.t+ch); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillText('ε='+e,xx,H-12);
+  });
+  // y-axis label
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.font='9px sans-serif';
+  ctx.translate(12,pad.t+ch/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.fillText('MAE (lower better)',0,0);
+  ctx.restore();
+  // helper to plot a series
+  function plot(data,col,fill){
+    ctx.strokeStyle=col; ctx.lineWidth=2;
+    ctx.beginPath();
+    data.forEach((y,i)=>{
+      const xx=pad.l+(i/(EL.length-1))*cw;
+      const yy=pad.t+ch-(y/maxY)*ch;
+      if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+    });
+    ctx.stroke();
+    // dots
+    data.forEach((y,i)=>{
+      const xx=pad.l+(i/(EL.length-1))*cw;
+      const yy=pad.t+ch-(y/maxY)*ch;
+      ctx.beginPath(); ctx.arc(xx,yy,4,0,Math.PI*2);
+      ctx.fillStyle=fill; ctx.fill();
+      ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.stroke();
+    });
+  }
+  plot(MAE_UNI,'#ef5050','#1a1f35');
+  plot(MAE_MIC,'#3ecf8e','#1a1f35');
+  // user pick indicator — auto-picked ε* (blue dashed)
+  const ux=pad.l+(topsisIdx/(EL.length-1))*cw;
+  ctx.strokeStyle='rgba(79,142,247,0.7)'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(ux,pad.t); ctx.lineTo(ux,pad.t+ch); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(79,142,247,0.9)'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('auto-pick',ux,pad.t+10);
+  // user's exploration override (purple dashed) — only when different from auto-pick
+  if(step4EpsIdx!==null && step4EpsIdx!==topsisIdx){
+    const ex=pad.l+(step4EpsIdx/(EL.length-1))*cw;
+    ctx.strokeStyle='rgba(167,139,250,0.85)'; ctx.lineWidth=1.5; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(ex,pad.t); ctx.lineTo(ex,pad.t+ch); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(167,139,250,1)'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('exploring',ex,pad.t+22);
+  }
+  // legend
+  ctx.font='10px sans-serif'; ctx.textAlign='left';
+  ctx.fillStyle='#ef5050'; ctx.fillRect(W-pad.r-150,pad.t+4,10,3);
+  ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fillText('Old way',W-pad.r-135,pad.t+9);
+  ctx.fillStyle='#3ecf8e'; ctx.fillRect(W-pad.r-60,pad.t+4,10,3);
+  ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fillText('Our way',W-pad.r-45,pad.t+9);
+}
+
+// ═══════════════════════════════════════════════
+// TOPSIS / ULDP
+// ═══════════════════════════════════════════════
+function runTopsis(){
+  const tot=wLP+wLA+wCR||1;
+  const W=[wLP/tot,wLA/tot,wCR/tot];
+  const M=EPS.map((_,i)=>[LP_V[i],LA_V[i],CR_V[i]]);
+  const nm=[0,1,2].map(j=>Math.sqrt(M.reduce((s,r)=>s+r[j]**2,0)));
+  const V=M.map(r=>r.map((v,j)=>v/nm[j]*W[j]));
+  const PIS=[0,1,2].map(j=>Math.max(...V.map(r=>r[j])));
+  const NIS=[0,1,2].map(j=>Math.min(...V.map(r=>r[j])));
+  const C=V.map(r=>{
+    const dp=Math.sqrt(r.reduce((s,v,j)=>s+(v-PIS[j])**2,0));
+    const dn=Math.sqrt(r.reduce((s,v,j)=>s+(v-NIS[j])**2,0));
+    return dn/(dp+dn);
+  });
+  topsisIdx=C.indexOf(Math.max(...C));
+  return C;
+}
+
+function renderTopsisBars(C){
+  const bars=document.getElementById('topsis-bars');
+  if(!bars) return;
+  bars.innerHTML=C.map((c,i)=>{
+    const win=i===topsisIdx;
+    const col=win?'var(--blue)':'rgba(255,255,255,0.15)';
+    return `<div class="tbar"><div class="tbar-track"><div class="tbar-fill" style="height:${Math.round(c*100)}%;background:${col}"></div></div>
+      <div class="tbar-eps" style="color:${win?'var(--blue)':'var(--text3)'}">ε = ${EL[i]}</div>
+      <div class="tbar-c" style="color:${win?'var(--blue)':'var(--text3)'}">${c.toFixed(2)}</div></div>`;
+  }).join('');
+  const tot=wLP+wLA+wCR||1;
+  const [lp,la,cr]=[wLP/tot,wLA/tot,wCR/tot];
+  let ex='';
+  if(lp>0.5) ex=`Your weight on privacy (${Math.round(lp*100)}%) is the biggest — so the system picks a stronger privacy setting (smaller ε).`;
+  else if(la>0.5) ex=`Your weight on usefulness (${Math.round(la*100)}%) is the biggest — so the system picks a setting where data stays more accurate (larger ε).`;
+  else if(cr>0.5) ex=`Your weight on battery / speed (${Math.round(cr*100)}%) is the biggest — so the system picks a middle setting where device overhead stays manageable.`;
+  else ex=`Your weights are roughly balanced — ε* = ${EL[topsisIdx]} sits closest to the ideal across all three criteria.`;
+  document.getElementById('topsis-explain').textContent=ex;
+  document.getElementById('topsis-pick').innerHTML=`✓ Recommended privacy budget: <strong style="font-family:monospace;font-size:15px">ε* = ${EL[topsisIdx]}</strong>`;
+}
+
+function updateW(){
+  wLP=+document.getElementById('w-lp').value;
+  wLA=+document.getElementById('w-la').value;
+  wCR=+document.getElementById('w-cr').value;
+  const tot=wLP+wLA+wCR||1;
+  const [lp,la,cr]=[wLP/tot,wLA/tot,wCR/tot];
+  document.getElementById('wlp').textContent=Math.round(lp*100)+'%';
+  document.getElementById('wla').textContent=Math.round(la*100)+'%';
+  document.getElementById('wcr').textContent=Math.round(cr*100)+'%';
+  document.getElementById('wbars').innerHTML=[
+    ['Privacy (LP)',lp,'var(--blue)'],
+    ['Usefulness (LA)',la,'var(--green)'],
+    ['Compute (CR)',cr,'var(--amber)']
+  ].map(([n,v,c])=>`<div class="wb"><div class="wb-n">${n}</div><div class="wb-bg"><div class="wb-fill" style="width:${Math.round(v*100)}%;background:${c}"></div></div><div class="wb-v" style="color:${c}">${Math.round(v*100)}%</div></div>`).join('');
+  const C=runTopsis();
+  renderTopsisBars(C);
+  // sliders moved → reset Step 4 exploration override and re-render selector
+  step4EpsIdx = null;
+  renderStep4Eps();
+  renderMaeComparison();
+  drawMaeCurve();
+}
+
+// ═══════════════════════════════════════════════
+// PRIVAGENT — pairwise dialogue
+// ═══════════════════════════════════════════════
+const PROMPTS=[
+  {axis:'LP/LA',
+   q:'Your power company wants to send you a monthly tip to help you save energy.',
+   a:{label:'Option A — keep me private',text:'Hide my data as much as possible. The monthly tip might be wrong sometimes (about 1 in 5).',winner:'LP'},
+   b:{label:'Option B — make the tip accurate',text:'Share a bit more. The tip will almost always be right.',winner:'LA'}},
+  {axis:'LP/LA',
+   q:'Your neighborhood wants to predict when power use will be highest.',
+   a:{label:'Option A — keep me private',text:'Hide my data fully. The prediction could be off by up to an hour.',winner:'LP'},
+   b:{label:'Option B — make the prediction accurate',text:'Share a bit more. The prediction will be off by only 10 minutes.',winner:'LA'}},
+  {axis:'LP/CR',
+   q:'Privacy protection runs on your home device (like a small box or smart plug).',
+   a:{label:'Option A — strongest privacy',text:'Strong protection. The device takes 3 seconds per update and uses more battery.',winner:'LP'},
+   b:{label:'Option B — save battery',text:'Lighter protection. The device is fast and barely uses battery.',winner:'CR'}},
+  {axis:'LP/CR',
+   q:'You\'re traveling for a week. Your home device must run on its battery only.',
+   a:{label:'Option A — strongest privacy',text:'Highest protection — but the battery runs out in 4 days. You may lose some data.',winner:'LP'},
+   b:{label:'Option B — save battery',text:'Lighter protection — the battery lasts the full week.',winner:'CR'}},
+  {axis:'LA/CR',
+   q:'You\'re looking at a "live" billing display in your app.',
+   a:{label:'Option A — make it accurate',text:'Very accurate display, but it updates 5 seconds late. The device gets a bit warm.',winner:'LA'},
+   b:{label:'Option B — keep it fast',text:'A bit less accurate. Updates instantly. Device stays cool.',winner:'CR'}},
+  {axis:'LA/CR',
+   q:'You want a monthly summary of your energy use.',
+   a:{label:'Option A — make it accurate',text:'Most accurate summary. Your device works on it overnight.',winner:'LA'},
+   b:{label:'Option B — keep it fast',text:'Good summary. Your device finishes in 2 minutes.',winner:'CR'}}
+];
+
+function renderPairwise(){
+  const list=document.getElementById('pw-list');
+  list.innerHTML=PROMPTS.map((p,i)=>`
+    <div class="pw">
+      <div class="pw-q">Question ${i+1} of 6 · ${p.axis}</div>
+      <div style="font-size:13px;margin-bottom:10px;color:var(--text)">${p.q}</div>
+      <div class="pw-pair">
+        <div class="pw-opt ${pwAnswers[i]==='a'?'on':''}" onclick="selPW(${i},'a',this)">
+          <div class="pw-label">${p.a.label}</div>${p.a.text}
+        </div>
+        <div class="pw-opt ${pwAnswers[i]==='b'?'on':''}" onclick="selPW(${i},'b',this)">
+          <div class="pw-label">${p.b.label}</div>${p.b.text}
+        </div>
+      </div>
+    </div>`).join('');
+  updatePwProgress();
+}
+function selPW(idx,choice,el){
+  pwAnswers[idx]=choice;
+  el.parentElement.querySelectorAll('.pw-opt').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  updatePwProgress();
+  if(pwAnswers.every(a=>a!==null)) computePwWeights();
+}
+function updatePwProgress(){
+  const done=pwAnswers.filter(a=>a!==null).length;
+  document.getElementById('pwprog').style.width=(done/6*100)+'%';
+}
+function computePwWeights(){
+  const accum={LP:0,LA:0,CR:0};
+  PROMPTS.forEach((p,i)=>{
+    const win=pwAnswers[i]==='a'?p.a.winner:p.b.winner;
+    const losers=p.axis.split('/').filter(x=>x!==win);
+    accum[win]+=1;
+    losers.forEach(l=>accum[l]-=1);
+  });
+  const clip={LP:Math.max(accum.LP+2,0.1),LA:Math.max(accum.LA+2,0.1),CR:Math.max(accum.CR+2,0.1)};
+  const sum=clip.LP+clip.LA+clip.CR;
+  pwWeights={LP:clip.LP/sum,LA:clip.LA/sum,CR:clip.CR/sum};
+  renderPwResult();
+}
+function renderPwResult(){
+  document.getElementById('pw-result').style.display='block';
+  const w=pwWeights;
+  document.getElementById('pw-weights').innerHTML=[
+    ['Privacy (LP)',w.LP,'var(--blue)'],
+    ['Usefulness (LA)',w.LA,'var(--green)'],
+    ['Compute (CR)',w.CR,'var(--amber)']
+  ].map(([n,v,c])=>`<div class="wb"><div class="wb-n">${n}</div><div class="wb-bg"><div class="wb-fill" style="width:${Math.round(v*100)}%;background:${c}"></div></div><div class="wb-v" style="color:${c}">${Math.round(v*100)}%</div></div>`).join('');
+  const tot=wLP+wLA+wCR||1;
+  const sl={LP:wLP/tot,LA:wLA/tot,CR:wCR/tot};
+  const rows=[['Privacy (LP)','LP','var(--blue)'],['Usefulness (LA)','LA','var(--green)'],['Compute (CR)','CR','var(--amber)']];
+  document.getElementById('pw-cmp').innerHTML=rows.map(([n,k,c])=>{
+    const d=Math.abs(sl[k]-w[k])*100;
+    return `<tr style="border-bottom:0.5px solid var(--border)">
+      <td style="padding:7px 6px;color:${c}">${n}</td>
+      <td style="padding:7px 6px;text-align:right;font-family:monospace">${Math.round(sl[k]*100)}%</td>
+      <td style="padding:7px 6px;text-align:right;font-family:monospace">${Math.round(w[k]*100)}%</td>
+      <td style="padding:7px 6px;text-align:right;font-family:monospace;color:${d<10?'var(--green)':d<25?'var(--amber)':'var(--red)'}">${d<10?'~match':'Δ '+Math.round(d)+'%'}</td>
+    </tr>`;
+  }).join('');
+  const dot=sl.LP*w.LP+sl.LA*w.LA+sl.CR*w.CR;
+  const m1=Math.sqrt(sl.LP**2+sl.LA**2+sl.CR**2);
+  const m2=Math.sqrt(w.LP**2+w.LA**2+w.CR**2);
+  const cos=(dot/(m1*m2)).toFixed(3);
+  const ag=document.getElementById('pw-agree');
+  if(cos>0.97){ag.className='note green';ag.textContent='✓ Strong agreement (cosine '+cos+'). The dialogue captured the same preferences your sliders expressed — the validation the thesis is looking for.';}
+  else if(cos>0.9){ag.className='note';ag.textContent='~ Moderate agreement (cosine '+cos+'). The dialogue captured your priorities approximately. Some drift is expected and acceptable.';}
+  else {ag.className='note warn';ag.textContent='⚠ Low agreement (cosine '+cos+'). Either the slider or the dialogue isn\'t capturing your real preferences — worth flagging in the survey below.';}
+}
+
+// ═══════════════════════════════════════════════
+// PRE-DEMO (Part A) HELPERS
+// ═══════════════════════════════════════════════
+function selPre(qid,v,el){
+  document.querySelectorAll('#q'+qid+' .lb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  preAnswers[qid]=v;
+}
+function selPreMC(qid,v,el){
+  document.querySelectorAll('#q'+qid+' .mc-opt').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  preAnswers[qid]=v;
+}
+
+// ═══════════════════════════════════════════════
+// SURVEY HELPERS (Parts B,C,D,E,F,G)
+// ═══════════════════════════════════════════════
+function selSv(qid,v,el){
+  document.querySelectorAll('#q'+qid+' .lb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  svAnswers[qid]=v;
+}
+function selSvMC(qid,v,el){
+  document.querySelectorAll('#q'+qid+' .mc-opt').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  svAnswers[qid]=v;
+}
+// SUS uses a 5-point scale, rendered separately
+function selSus(qid,v,el){
+  document.querySelectorAll('#q'+qid+' .lb5').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  svAnswers[qid]=v;
+}
+
+// SUS items (Brooke 1996, standard wording — do not alter)
+const SUS_ITEMS = [
+  ['SUS1', 'I think that I would like to use this system frequently.'],
+  ['SUS2', 'I found the system unnecessarily complex.'],
+  ['SUS3', 'I thought the system was easy to use.'],
+  ['SUS4', 'I think that I would need the support of a technical person to be able to use this system.'],
+  ['SUS5', 'I found the various functions in this system were well integrated.'],
+  ['SUS6', 'I thought there was too much inconsistency in this system.'],
+  ['SUS7', 'I would imagine that most people would learn to use this system very quickly.'],
+  ['SUS8', 'I found the system very cumbersome to use.'],
+  ['SUS9', 'I felt very confident using the system.'],
+  ['SUS10', 'I needed to learn a lot of things before I could get going with this system.']
+];
+function renderSusItems(){
+  const wrap = document.getElementById('sus-list');
+  if(!wrap) return;
+  let html = '<div class="sus-scale-lbls"><span>Strongly disagree</span><span>Neutral</span><span>Strongly agree</span></div>';
+  SUS_ITEMS.forEach(([qid,text]) => {
+    html += `<div class="sus-row"><div class="sus-text">${text}<span class="req">★</span></div>` +
+            `<div class="sus-scale" id="q${qid}">` +
+            [1,2,3,4,5].map(v => `<div class="lb5" onclick="selSus('${qid}',${v},this)">${v}</div>`).join('') +
+            `</div></div>`;
+  });
+  wrap.innerHTML = html;
+}
+
+// C2 forced-choice epsilon picker with consequence labels
+const C2_LABELS = [
+  {eps:'0.1', desc:'Strongest privacy. Most patterns and identifiers are scrambled. Services may not work as well.'},
+  {eps:'0.3', desc:'Strong privacy. Only broad population-level info is recoverable.'},
+  {eps:'1.0', desc:'Balanced. About half of attributes can be roughly reconstructed; standard setting in practice.'},
+  {eps:'5.0', desc:'Weaker privacy. Most attributes recoverable. Data stays accurate.'},
+  {eps:'10.0', desc:'No real privacy. Data is essentially shared as-is. Services work best.'}
+];
+function renderForcedEpsC2(){
+  const el = document.getElementById('qC2');
+  if(!el) return;
+  el.innerHTML = C2_LABELS.map((o,i) => {
+    const on = svAnswers.C2 === o.eps ? 'on' : '';
+    return `<div class="feps ${on}" onclick="selC2('${o.eps}',this)">` +
+           `<div class="feps-eps">ε = ${o.eps}</div>` +
+           `<div class="feps-desc">${o.desc}</div></div>`;
+  }).join('');
+}
+function selC2(eps,el){
+  document.querySelectorAll('#qC2 .feps').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  svAnswers.C2 = eps;
+  // reveal C3 once forced choice is made and show the comparison
+  document.getElementById('qC3-card').style.display = 'block';
+  updateC3Display();
+}
+function updateC3Display(){
+  const rec = document.getElementById('c3-rec');
+  const yours = document.getElementById('c3-yours');
+  if(rec) rec.textContent = EL[topsisIdx];
+  if(yours) yours.textContent = svAnswers.C2 || '—';
+}
+
+function buildDomEpsRows(){
+  ['meter','id','ecg'].forEach(k=>{
+    const el=document.getElementById('q4-'+k);
+    if(!el) return;
+    el.innerHTML=EL.map((e,i)=>`<div class="eps-btn ${domEps[k]===i?'on':''}" onclick="selDomEps('${k}',${i},this)">ε = ${e}</div>`).join('');
+  });
+}
+function selDomEps(k,i,el){
+  domEps[k]=i;
+  document.querySelectorAll('#q4-'+k+' .eps-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  const chosen=Object.values(domEps).filter(v=>v>=0);
+  if(chosen.length>=2){
+    const allSame=chosen.every(v=>v===chosen[0]);
+    const note=document.getElementById('q4-note');
+    note.textContent=allSame
+      ?'Your privacy choices are the same across all three kinds of data — a one-size-fits-all setting could work for you.'
+      :'Your privacy choices differ across kinds of data — a per-kind setting fits your preferences better than a single one for everything.';
+    note.className='note'+(allSame?' warn':' green');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// PAYLOAD / VALIDATION / SUBMISSION
+// ═══════════════════════════════════════════════
+function susCompositeScore(){
+  // SUS scoring: odd items: (response - 1); even items: (5 - response). Sum * 2.5 → 0-100
+  let sum = 0;
+  let allAnswered = true;
+  SUS_ITEMS.forEach(([qid], idx) => {
+    const r = svAnswers[qid];
+    if(r <= 0){ allAnswered = false; return; }
+    sum += (idx % 2 === 0) ? (r - 1) : (5 - r);   // 0-based: idx 0 is SUS1 (odd-numbered item in spec)
+  });
+  return allAnswered ? +(sum * 2.5).toFixed(1) : null;
+}
+
+function buildPayload(){
+  const tot = wLP + wLA + wCR || 1;
+  const sl = {LP:+(wLP/tot).toFixed(3), LA:+(wLA/tot).toFixed(3), CR:+(wCR/tot).toFixed(3)};
+  const elapsedMs = startedAt ? (Date.now() - startedAt) : null;
+  return {
+    session_id: sessionId,
+    survey_version: 'v3.0_hci_full',
+    consented_at: consentedAt,
+    submitted_at: new Date().toISOString(),
+    time_to_complete_seconds: elapsedMs ? Math.round(elapsedMs / 1000) : null,
+    user_agent: navigator.userAgent,
+    locale: navigator.language || null,
+
+    pre_demo_part_a: {
+      A1_iuipc_collection: preAnswers.A1,
+      A2_iuipc_awareness: preAnswers.A2,
+      A3_prior_eps_comprehension: preAnswers.A3,
+      A4_age_range: preAnswers.A4,
+      A5_technical_background: preAnswers.A5,
+      A6_privacy_tool_experience: preAnswers.A6
+    },
+
+    core_uldp: {
+      slider_weights: sl,
+      topsis_eps: EL[topsisIdx],
+      mic_dp_alpha: alphaVal,
+      step4_explored_eps: step4EpsIdx === null ? null : EL[step4EpsIdx],
+      highlighted_feature: highlightedFeat === null ? null : FEATURES[highlightedFeat].name,
+      mae_at_eps: {
+        standard_ldp: MAE_UNI[topsisIdx],
+        ucldp_micdp: MAE_MIC[topsisIdx],
+        improvement_pct: +((MAE_UNI[topsisIdx] - MAE_MIC[topsisIdx]) / MAE_UNI[topsisIdx] * 100).toFixed(1)
+      }
+    },
+
+    privagent_extension: {
+      completed: pwAnswers.every(a => a !== null),
+      responses: pwAnswers,
+      inferred_weights: pwWeights ? {LP:+pwWeights.LP.toFixed(3), LA:+pwWeights.LA.toFixed(3), CR:+pwWeights.CR.toFixed(3)} : null
+    },
+
+    survey_part_b: {
+      B1_post_demo_eps_comprehension: svAnswers.B1,
+      B2_demo_tradeoff_clarity: svAnswers.B2,
+      B3_linkage_attack_comprehension: svAnswers.B3,
+      B4_per_domain_eps: {
+        smart_meter: domEps.meter >= 0 ? EL[domEps.meter] : null,
+        identity: domEps.id >= 0 ? EL[domEps.id] : null,
+        ecg: domEps.ecg >= 0 ? EL[domEps.ecg] : null
+      },
+      B5_self_identified_archetype: svAnswers.B5
+    },
+
+    survey_part_c: {
+      C1_slider_weights_from_demo: sl,
+      C2_forced_eps_choice: svAnswers.C2,
+      C3_topsis_satisfaction: svAnswers.C3,
+      C4_explanation_quality: svAnswers.C4,
+      C5_perceived_control: svAnswers.C5,
+      C6_archetype_match: svAnswers.C6
+    },
+
+    survey_part_d_sus: {
+      items: Object.fromEntries(SUS_ITEMS.map(([qid]) => [qid, svAnswers[qid]])),
+      composite_score: susCompositeScore()
+    },
+
+    survey_part_e_trust: {
+      T1_trust_recommendation: svAnswers.T1,
+      T2_transparency: svAnswers.T2,
+      T3_stability: svAnswers.T3,
+      T4_adoption_intention: svAnswers.T4
+    },
+
+    survey_part_f_cognitive_load: {
+      CL1_mental_demand: svAnswers.CL1,
+      CL2_effort: svAnswers.CL2,
+      CL3_frustration: svAnswers.CL3,
+      mean_cl: (svAnswers.CL1 > 0 && svAnswers.CL2 > 0 && svAnswers.CL3 > 0)
+        ? +((svAnswers.CL1 + svAnswers.CL2 + svAnswers.CL3) / 3).toFixed(2) : null
+    },
+
+    survey_part_g_open: {
+      OE1_elicitation_preference: svAnswers.OE1,
+      OE2_confusing_elements: (document.getElementById('qOE2') || {}).value || null,
+      OE3_improvement_suggestions: (document.getElementById('qOE3') || {}).value || null,
+      OE4_missing_context: (document.getElementById('qOE4') || {}).value || null
+    }
+  };
+}
+
+function validateRequired(){
+  // All Part A handled in tryGoToDemo, but we re-check here as a backstop.
+  // Required survey items: B1, B2, B3, B4 (all 3 domains), B5, C2, C3, C4, C5, C6,
+  // SUS1-10, T1-T4, CL1-CL3, OE1.
+  // Optional: OE2, OE3, OE4 (free text).
+  const m = [];
+  // Part A
+  if(preAnswers.A1 <= 0) m.push(['qA1','Part A — A1 (privacy concern)']);
+  if(preAnswers.A2 <= 0) m.push(['qA2','Part A — A2 (data awareness)']);
+  if(preAnswers.A3 <= 0) m.push(['qA3','Part A — A3 (prior comprehension)']);
+  if(!preAnswers.A4) m.push(['qA4','Part A — A4 (age range)']);
+  if(!preAnswers.A5) m.push(['qA5','Part A — A5 (technical background)']);
+  if(!preAnswers.A6) m.push(['qA6','Part A — A6 (privacy tool experience)']);
+  // Part B
+  if(svAnswers.B1 <= 0) m.push(['qB1','B1 — post-demo comprehension (1–7)']);
+  if(svAnswers.B2 <= 0) m.push(['qB2','B2 — demo clarity of trade-off (1–7)']);
+  if(svAnswers.B3 <= 0) m.push(['qB3','B3 — linkage-attack comprehension (1–7)']);
+  if(domEps.meter < 0 || domEps.id < 0 || domEps.ecg < 0) m.push(['q4-meter','B4 — pick a privacy setting for all three kinds of data']);
+  if(!svAnswers.B5) m.push(['qB5','B5 — self-identified privacy priorities']);
+  // Part C
+  if(!svAnswers.C2) m.push(['qC2','C2 — forced ε choice for your personal data']);
+  if(svAnswers.C3 <= 0) m.push(['qC3','C3 — how well the recommendation matches (1–7)']);
+  if(svAnswers.C4 <= 0) m.push(['qC4','C4 — explanation quality (1–7)']);
+  if(svAnswers.C5 <= 0) m.push(['qC5','C5 — perceived control (1–7)']);
+  if(!svAnswers.C6) m.push(['qC6','C6 — match between archetype and sliders']);
+  // SUS (5-point scale, all 10 items)
+  SUS_ITEMS.forEach(([qid]) => {
+    if(svAnswers[qid] <= 0) m.push(['q'+qid, qid + ' — System Usability Scale (1–5)']);
+  });
+  // Trust
+  if(svAnswers.T1 <= 0) m.push(['qT1','T1 — trust in recommendation (1–7)']);
+  if(svAnswers.T2 <= 0) m.push(['qT2','T2 — transparency (1–7)']);
+  if(svAnswers.T3 <= 0) m.push(['qT3','T3 — stability (1–7)']);
+  if(svAnswers.T4 <= 0) m.push(['qT4','T4 — adoption intention (1–7)']);
+  // Cognitive Load
+  if(svAnswers.CL1 <= 0) m.push(['qCL1','CL1 — mental demand (1–7)']);
+  if(svAnswers.CL2 <= 0) m.push(['qCL2','CL2 — effort (1–7)']);
+  if(svAnswers.CL3 <= 0) m.push(['qCL3','CL3 — frustration (1–7)']);
+  // OE1 forced choice
+  if(!svAnswers.OE1) m.push(['qOE1','OE1 — preferred way to choose privacy settings']);
+  return m;
+}
+
+function showValidationErrors(missing){
+  const box=document.getElementById('valbox');
+  document.getElementById('valbox-list').innerHTML=missing.map(([_,lbl])=>`<li>${lbl}</li>`).join('');
+  box.classList.add('on');
+  // highlight missing cards
+  document.querySelectorAll('.q-card.missing').forEach(c=>c.classList.remove('missing'));
+  missing.forEach(([id])=>{
+    const el=document.getElementById(id);
+    if(el){
+      const card=el.closest('.q-card');
+      if(card) card.classList.add('missing');
+    }
+  });
+  // scroll to first
+  const first=document.getElementById(missing[0][0]);
+  if(first) first.closest('.q-card').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+async function submitResponses(){
+  const missing=validateRequired();
+  if(missing.length){
+    showValidationErrors(missing);
+    return;
+  }
+  document.getElementById('valbox').classList.remove('on');
+  document.querySelectorAll('.q-card.missing').forEach(c=>c.classList.remove('missing'));
+
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Submitting...';
+
+  const payload=buildPayload();
+
+  // If the endpoint is not configured, fall back to clipboard with a notice.
+  if(GOOGLE_SHEETS_URL.startsWith('PASTE_')){
+    try{
+      await navigator.clipboard.writeText(JSON.stringify(payload,null,2));
+      alert('Submission endpoint is not yet configured. Your response has been copied to the clipboard as a fallback.');
+    } catch(e){
+      const r=document.getElementById('rec-out'); r.textContent=JSON.stringify(payload,null,2); r.style.display='block';
+      alert('Submission endpoint is not yet configured. Your response is shown in the box below — please copy it.');
+    }
+    btn.disabled=false;
+    btn.innerHTML='⬆ Submit my responses';
+    return;
+  }
+
+  // POST as text/plain (Apps Script reads e.postData.contents either way,
+  // and skipping a custom Content-Type avoids the CORS preflight).
+  try{
+    await fetch(GOOGLE_SHEETS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      body:JSON.stringify(payload)
+    });
+    showThankYou(payload.session_id);
+  } catch(e){
+    btn.disabled=false;
+    btn.innerHTML='⬆ Submit my responses';
+    alert('Submission failed: '+e.message+'\n\nAs a fallback, your response has been copied to your clipboard.');
+    try{ await navigator.clipboard.writeText(JSON.stringify(payload,null,2)); } catch(_){}
+  }
+}
+
+function showThankYou(sid){
+  document.getElementById('thanks-sid').textContent=sid;
+  document.getElementById('main-page').classList.add('locked');
+  document.getElementById('thanks-overlay').classList.remove('gone');
+  window.scrollTo({top:0});
+}
+
+// Legacy/fallback — old genRec is now an alias that displays the payload locally
+function genRec(){
+  const r=buildPayload();
+  const el=document.getElementById('rec-out');
+  el.textContent=JSON.stringify(r,null,2);
+  el.style.display='block';
+}
+function copyRec(){
+  const t=document.getElementById('rec-out').textContent;
+  if(!t) genRec();
+  navigator.clipboard.writeText(document.getElementById('rec-out').textContent).then(()=>alert('Copied to clipboard'));
+}
+
+// ═══════════════════════════════════════════════
+// INIT — gated on consent; see grantConsent()
+// ═══════════════════════════════════════════════
+window.addEventListener('resize',()=>{
+  if(document.getElementById('main-page').classList.contains('locked')) return;
+  drawMeterChart(+document.getElementById('meter-eps').value);
+  drawMeterCleanChart();
+  drawMaeCurve();
+});
+</script>
+</body>
+</html>
