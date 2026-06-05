@@ -87,7 +87,7 @@ h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--text)}
 .stage-cur b{color:var(--blue)}
 /* canvas wrap */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.cvs-wrap{position:relative;background:#000;border-radius:var(--r);overflow:hidden}
+.cvs-wrap{position:relative;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
 .cvs-wrap canvas{display:block;width:100%}
 .cvs-lbl{position:absolute;top:8px;left:8px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:8px;background:rgba(0,0,0,.55)}
 /* slider */
@@ -1111,7 +1111,7 @@ const MAE_MIC=[0.69, 0.49, 0.27, 0.13, 0.07];   // MIC-DP MAE at each ε
 //   3. Deploy → New deployment → Web app → Execute as: Me · Who has access: Anyone
 //   4. Copy the resulting /macros/s/.../exec URL and paste it here
 // If left as the placeholder, Submit falls back to "Copy JSON" with a notice.
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzBaOD6f8ds7A45he1UCHv29_M88G8fS813lXEZlqt6Kr3XKFqYi7veTZckR9DqWGExBQ/exec";
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwRgyMcxPMtpxUv9n6nqW-_Vats23MhFh3bLHpFtbyAbZxjJdkskuG94FKfgM7kd5FR9A/exec";
 
 // session-scoped state
 let sessionId = null;
@@ -1191,7 +1191,7 @@ function updateProgress(n){
 function goPane(n){
   ['pane0','pane1','pane2','pane3'].forEach((p,i)=>document.getElementById(p).classList.toggle('on',i===n));
   // Light theme for survey panes (0=Part A, 2=PrivAgent, 3=Survey); dark for demo (1)
-  document.body.classList.toggle('light-mode', n !== 1);
+  document.body.classList.add('light-mode');  // all panes light-themed
   updateProgress(n);
   window.scrollTo({top:0,behavior:'smooth'});
   paneEnterTs[n] = Date.now();
@@ -1259,8 +1259,8 @@ function drawMeterChart(eidx){
   const W=cvs.width=cvs.offsetWidth||820, H=cvs.height=160;
   const ctx=cvs.getContext('2d');
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#0d0d1a'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(245,166,35,0.06)'; ctx.lineWidth=.5;
+  ctx.fillStyle='#f9fafb'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(15,23,42,0.06)'; ctx.lineWidth=.5;
   for(let x=0;x<W;x+=W/24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   const maxV=4, pad={l:28,r:8,t:16,b:28};
   const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
@@ -1270,12 +1270,12 @@ function drawMeterChart(eidx){
     const nv=Math.max(0,v+(Math.random()-.5)*sigma*2);
     const bh=(nv/maxV)*ch;
     const x=pad.l+i*bw+1, y=pad.t+ch-bh;
-    ctx.fillStyle=sigma>0.5?'rgba(245,166,35,0.42)':'rgba(245,166,35,0.78)';
+    ctx.fillStyle=sigma>0.5?'rgba(217,119,6,0.55)':'rgba(217,119,6,0.92)';
     ctx.fillRect(x,y,bw-2,bh);
   });
   [0,6,12,18,23].forEach(h=>{
     const x=pad.l+h*bw+bw/2;
-    ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='8px monospace'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(15,23,42,0.55)'; ctx.font='8px monospace'; ctx.textAlign='center';
     ctx.fillText(h+':00',x,H-8);
   });
   if(eidx>=2){
@@ -1289,7 +1289,7 @@ function drawMeterChart(eidx){
     });
   }
   if(eidx<2){
-    ctx.fillStyle='rgba(62,207,142,0.65)'; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(21,128,61,0.85)'; ctx.font='10px monospace'; ctx.textAlign='center';
     ctx.fillText('Pattern obscured — adversary cannot infer behaviour',W/2,H/2);
   }
   ctx.textAlign='left';
@@ -1301,8 +1301,8 @@ function drawMeterCleanChart(){
   const W=cvs.width=cvs.offsetWidth||400, H=cvs.height=160;
   const ctx=cvs.getContext('2d');
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#08120a'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(62,207,142,0.07)'; ctx.lineWidth=.5;
+  ctx.fillStyle='#f6fbf7'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(21,128,61,0.10)'; ctx.lineWidth=.5;
   for(let x=0;x<W;x+=W/24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   const maxV=4, pad={l:28,r:8,t:16,b:28};
   const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
@@ -1311,13 +1311,13 @@ function drawMeterCleanChart(){
   METER_PAT.forEach((v,i)=>{
     const bh=(v/maxV)*ch;
     const x=pad.l+i*bw+1, y=pad.t+ch-bh;
-    ctx.fillStyle='rgba(62,207,142,0.78)';
+    ctx.fillStyle='rgba(21,128,61,0.78)';
     ctx.fillRect(x,y,bw-2,bh);
   });
   // hour labels
   [0,6,12,18,23].forEach(h=>{
     const x=pad.l+h*bw+bw/2;
-    ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='8px monospace'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(15,23,42,0.55)'; ctx.font='8px monospace'; ctx.textAlign='center';
     ctx.fillText(h+':00',x,H-8);
   });
   // always show the pattern markers since this is the unprotected version
@@ -1356,12 +1356,12 @@ function onMeterEps(i){
 function drawFace(cvs){
   const W=cvs.width=300,H=cvs.height=200;
   const ctx=cvs.getContext('2d');
-  ctx.fillStyle='#0d1128'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#151c35';
+  ctx.fillStyle='#eef2f8'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#ffffff';
   if(ctx.roundRect){ctx.beginPath(); ctx.roundRect(10,10,W-20,H-20,8); ctx.fill();}
   else ctx.fillRect(10,10,W-20,H-20);
   ctx.strokeStyle='rgba(79,142,247,0.3)'; ctx.lineWidth=1; ctx.stroke();
-  ctx.fillStyle='#1e2847'; ctx.fillRect(16,20,80,100);
+  ctx.fillStyle='#dde6f2'; ctx.fillRect(16,20,80,100);
   const fx=56,fy=62;
   ctx.beginPath(); ctx.ellipse(fx,fy,24,30,0,0,Math.PI*2);
   ctx.fillStyle='#c8956c'; ctx.fill();
@@ -1372,14 +1372,14 @@ function drawFace(cvs){
   ctx.beginPath(); ctx.ellipse(fx,fy-26,25,12,0,Math.PI,0); ctx.fillStyle='#1a0905'; ctx.fill();
   const fields=[['NAME','Alex J. Chen'],['DOB','14-Sep-1968'],['MRN','NHS-440821'],['GP','Teddington Medical']];
   fields.forEach(([k,v],i)=>{
-    ctx.font='bold 7px monospace'; ctx.fillStyle='rgba(79,142,247,0.7)';
+    ctx.font='bold 7px monospace'; ctx.fillStyle='rgba(37,99,235,0.85)';
     ctx.fillText(k, 106, 30+i*22);
-    ctx.font='8px monospace'; ctx.fillStyle='rgba(221,225,240,0.85)';
+    ctx.font='8px monospace'; ctx.fillStyle='rgba(15,23,42,0.85)';
     ctx.fillText(v, 106, 41+i*22);
   });
-  ctx.strokeStyle='rgba(79,142,247,0.2)'; ctx.lineWidth=.5;
+  ctx.strokeStyle='rgba(37,99,235,0.35)'; ctx.lineWidth=.5;
   ctx.strokeRect(16,20,W-32,100);
-  ctx.fillStyle='rgba(79,142,247,0.5)'; ctx.font='bold 7px monospace';
+  ctx.fillStyle='rgba(37,99,235,0.7)'; ctx.font='bold 7px monospace';
   ctx.fillText('CONFIDENTIAL HEALTH RECORD', 16, H-12);
 }
 // Apply k-RR (k-ary Randomized Response) at character level to each field VALUE.
@@ -1413,13 +1413,13 @@ function drawNoisyCard(cvs,eidx){
   const W=cvs.width=300,H=cvs.height=200;
   const ctx=cvs.getContext('2d');
   // card surface
-  ctx.fillStyle='#0d1128'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#151c35';
+  ctx.fillStyle='#fbeded'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#ffffff';
   if(ctx.roundRect){ctx.beginPath(); ctx.roundRect(10,10,W-20,H-20,8); ctx.fill();}
   else ctx.fillRect(10,10,W-20,H-20);
-  ctx.strokeStyle='rgba(239,80,80,0.45)'; ctx.lineWidth=1; ctx.stroke();
+  ctx.strokeStyle='rgba(220,38,38,0.6)'; ctx.lineWidth=1; ctx.stroke();
   // photo & face — unchanged (image is context, not the sensitive record)
-  ctx.fillStyle='#1e2847'; ctx.fillRect(16,20,80,100);
+  ctx.fillStyle='#dde6f2'; ctx.fillRect(16,20,80,100);
   const fx=56,fy=62;
   ctx.beginPath(); ctx.ellipse(fx,fy,24,30,0,0,Math.PI*2);
   ctx.fillStyle='#c8956c'; ctx.fill();
@@ -1430,18 +1430,18 @@ function drawNoisyCard(cvs,eidx){
   ctx.beginPath(); ctx.ellipse(fx,fy-26,25,12,0,Math.PI,0); ctx.fillStyle='#1a0905'; ctx.fill();
   // field values via character-level RR
   const keep=RR_KEEP[eidx];
-  const valCol=eidx<=1?'rgba(239,80,80,0.92)':eidx===2?'rgba(245,166,35,0.92)':'rgba(221,225,240,0.92)';
+  const valCol=eidx<=1?'rgba(220,38,38,0.92)':eidx===2?'rgba(180,83,9,0.92)':'rgba(15,23,42,0.88)';
   const fields=[['NAME','Alex J. Chen'],['DOB','14-Sep-1968'],['MRN','NHS-440821'],['GP','Teddington Medical']];
   fields.forEach(([k,v],i)=>{
-    ctx.font='bold 7px monospace'; ctx.fillStyle='rgba(79,142,247,0.7)';
+    ctx.font='bold 7px monospace'; ctx.fillStyle='rgba(37,99,235,0.85)';
     ctx.fillText(k, 106, 30+i*22);
     ctx.font='8px monospace'; ctx.fillStyle=valCol;
     ctx.fillText(rrFieldValue(v,keep), 106, 41+i*22);
   });
   // border + footer label
-  ctx.strokeStyle='rgba(239,80,80,0.25)'; ctx.lineWidth=.5;
+  ctx.strokeStyle='rgba(220,38,38,0.4)'; ctx.lineWidth=.5;
   ctx.strokeRect(16,20,W-32,100);
-  ctx.fillStyle='rgba(239,80,80,0.78)'; ctx.font='bold 7px monospace';
+  ctx.fillStyle='rgba(220,38,38,0.85)'; ctx.font='bold 7px monospace';
   ctx.fillText(`RANDOMIZED RESPONSE  ε = ${EL[eidx]}  ·  keep rate ${Math.round(keep*100)}%`, 16, H-12);
 }
 function renderIdTable(eidx){
@@ -1491,12 +1491,12 @@ function initIdentityPanel(){
 function drawECG(cvs,noisy,sigma){
   const W=cvs.width=560,H=cvs.height=180;
   const ctx=cvs.getContext('2d');
-  ctx.fillStyle=noisy?'#0a1505':'#030d06'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle=noisy?'rgba(62,207,142,0.07)':'rgba(62,207,142,0.12)'; ctx.lineWidth=.5;
+  ctx.fillStyle=noisy?'#f3faf6':'#f8fcf9'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=noisy?'rgba(21,128,61,0.10)':'rgba(21,128,61,0.16)'; ctx.lineWidth=.5;
   for(let x=0;x<W;x+=18){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=0;y<H;y+=18){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   const cy=H/2+10;
-  ctx.strokeStyle=noisy?'rgba(62,207,142,0.6)':'#3ecf8e'; ctx.lineWidth=noisy?1.5:2;
+  ctx.strokeStyle=noisy?'rgba(21,128,61,0.55)':'#15803d'; ctx.lineWidth=noisy?1.5:2;
   ctx.beginPath();
   const beatW=88;
   for(let bx=0;bx<W+beatW;bx+=beatW){
@@ -1509,7 +1509,7 @@ function drawECG(cvs,noisy,sigma){
     ctx.lineTo(bx+beatW,cy+n());
   }
   ctx.stroke();
-  ctx.fillStyle='rgba(62,207,142,0.7)'; ctx.font='bold 7px monospace';
+  ctx.fillStyle='rgba(21,128,61,0.85)'; ctx.font='bold 7px monospace';
   ctx.fillText(noisy?'LDP OUTPUT  HR: UNCERTAIN':'LEAD II  HR: 78bpm  QRS: 94ms  QTc: 420ms',8,14);
 }
 function onEcgEps(i){
@@ -1672,28 +1672,29 @@ function drawMaeCurve(){
   const W=cvs.width=cvs.offsetWidth||760, H=cvs.height=180;
   const ctx=cvs.getContext('2d');
   ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
   const pad={l:42,r:14,t:12,b:32};
   const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
   const maxY=1.3;
   // grid
-  ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=.5;
+  ctx.strokeStyle='rgba(15,23,42,0.07)'; ctx.lineWidth=.5;
   [0.25,0.5,0.75,1.0].forEach(y=>{
     const yy=pad.t+ch-(y/maxY)*ch;
     ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(W-pad.r,yy); ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='9px monospace'; ctx.textAlign='right';
+    ctx.fillStyle='rgba(15,23,42,0.55)'; ctx.font='9px monospace'; ctx.textAlign='right';
     ctx.fillText(y.toFixed(2),pad.l-5,yy+3);
   });
   // x-axis ticks
   EL.forEach((e,i)=>{
     const xx=pad.l+(i/(EL.length-1))*cw;
-    ctx.strokeStyle='rgba(255,255,255,0.08)';
+    ctx.strokeStyle='rgba(15,23,42,0.08)';
     ctx.beginPath(); ctx.moveTo(xx,pad.t); ctx.lineTo(xx,pad.t+ch); ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(15,23,42,0.6)'; ctx.font='10px monospace'; ctx.textAlign='center';
     ctx.fillText('ε='+e,xx,H-12);
   });
   // y-axis label
   ctx.save();
-  ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.font='9px sans-serif';
+  ctx.fillStyle='rgba(15,23,42,0.6)'; ctx.font='9px sans-serif';
   ctx.translate(12,pad.t+ch/2); ctx.rotate(-Math.PI/2);
   ctx.textAlign='center'; ctx.fillText('MAE (lower better)',0,0);
   ctx.restore();
@@ -1716,8 +1717,8 @@ function drawMaeCurve(){
       ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.stroke();
     });
   }
-  plot(MAE_UNI,'#ef5050','#1a1f35');
-  plot(MAE_MIC,'#3ecf8e','#1a1f35');
+  plot(MAE_UNI,'#dc2626','#ffffff');
+  plot(MAE_MIC,'#15803d','#ffffff');
   // user pick indicator — auto-picked ε* (blue dashed)
   const ux=pad.l+(topsisIdx/(EL.length-1))*cw;
   ctx.strokeStyle='rgba(79,142,247,0.7)'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
@@ -1736,10 +1737,10 @@ function drawMaeCurve(){
   }
   // legend
   ctx.font='10px sans-serif'; ctx.textAlign='left';
-  ctx.fillStyle='#ef5050'; ctx.fillRect(W-pad.r-150,pad.t+4,10,3);
-  ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fillText('Old way',W-pad.r-135,pad.t+9);
-  ctx.fillStyle='#3ecf8e'; ctx.fillRect(W-pad.r-60,pad.t+4,10,3);
-  ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fillText('Our way',W-pad.r-45,pad.t+9);
+  ctx.fillStyle='#dc2626'; ctx.fillRect(W-pad.r-150,pad.t+4,10,3);
+  ctx.fillStyle='rgba(15,23,42,0.75)'; ctx.fillText('Old way',W-pad.r-135,pad.t+9);
+  ctx.fillStyle='#15803d'; ctx.fillRect(W-pad.r-60,pad.t+4,10,3);
+  ctx.fillStyle='rgba(15,23,42,0.75)'; ctx.fillText('Our way',W-pad.r-45,pad.t+9);
 }
 
 // ═══════════════════════════════════════════════
@@ -1767,7 +1768,7 @@ function renderTopsisBars(C){
   if(!bars) return;
   bars.innerHTML=C.map((c,i)=>{
     const win=i===topsisIdx;
-    const col=win?'var(--blue)':'rgba(255,255,255,0.15)';
+    const col=win?'var(--blue)':'rgba(15,23,42,0.20)';
     return `<div class="tbar"><div class="tbar-track"><div class="tbar-fill" style="height:${Math.round(c*100)}%;background:${col}"></div></div>
       <div class="tbar-eps" style="color:${win?'var(--blue)':'var(--text3)'}">ε = ${EL[i]}</div>
       <div class="tbar-c" style="color:${win?'var(--blue)':'var(--text3)'}">${c.toFixed(2)}</div></div>`;
