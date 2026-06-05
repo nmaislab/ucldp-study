@@ -17,8 +17,22 @@
   --teal:#2dd4bf;--teal-d:rgba(45,212,191,0.12);
   --r:10px;--rl:16px;
 }
+/* Light theme for survey panes — keeps demo pane dark for its data visualizations,
+   uses a light surface for the survey panes to avoid inflating NASA-TLX cognitive
+   load scores (advisor request, 2026-06-03). */
+body.light-mode{
+  --bg:#f6f7fb;--bg2:#ffffff;--bg3:#eef0f5;--bg4:#e2e6ee;
+  --border:rgba(15,23,42,0.10);--border2:rgba(15,23,42,0.16);
+  --text:#1a1d24;--text2:#475569;--text3:#94a3b8;
+  --blue:#2563eb;--blue-d:rgba(37,99,235,0.10);
+  --green:#15803d;--green-d:rgba(21,128,61,0.08);
+  --amber:#b45309;--amber-d:rgba(180,83,9,0.10);
+  --red:#dc2626;--red-d:rgba(220,38,38,0.08);
+  --purple:#7c3aed;--purple-d:rgba(124,58,237,0.10);
+  --teal:#0d9488;--teal-d:rgba(13,148,136,0.10);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;transition:background .25s ease,color .25s ease}
 .page{max-width:880px;margin:0 auto;padding:24px 20px 80px}
 .timebar{display:flex;align-items:center;gap:8px;padding:8px 14px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg2);font-size:11px;color:var(--text2);margin-bottom:16px}
 .timebar b{color:var(--text);font-weight:600}
@@ -280,8 +294,14 @@ h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--text)}
     </ul>
 
     <div class="contacts">
+      <strong style="color:var(--text2)">Research team contacts</strong><br>
+      Principal Investigator: <strong>Wenjun Yang</strong>, PhD Candidate · <a href="mailto:wy927@uw.edu" style="color:var(--blue);text-decoration:none">wy927@uw.edu</a><br>
+      Faculty Advisor: <strong>Dr. Eyhab Al-Masri</strong> · <a href="mailto:ealmasri@uw.edu" style="color:var(--blue);text-decoration:none">ealmasri@uw.edu</a><br>
+      <br>
+      <span style="color:var(--text3);font-size:11px">This study has been reviewed by the University of Washington Human Subjects Division and determined to qualify for exempt status (IRB ID: STUDY00025867). Questions about your rights as a research participant: <a href="mailto:hsdinfo@uw.edu" style="color:var(--blue);text-decoration:none">hsdinfo@uw.edu</a> or (206) 543-0098.</span><br>
+      <br>
       Want to learn more about this research? Read the published paper:<br>
-      <a href="https://urldefense.com/v3/__https://ieeexplore.ieee.org/document/11218270__;!!K-Hz7m0Vt54!iRX6g_23aggjXKbedlaHn1FsXGUhSDt8Wk3cfhdRw2NiOWe9VC8LbvUjruKxNQfMIZFxQ74F_uOE$" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📄 IEEE Transactions on Privacy — "MIC-DP" (2025)</a>
+      <a href="https://ieeexplore.ieee.org/document/11218270" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📄 IEEE Transactions on Privacy — "MIC-DP" (2025)</a>
     </div>
 
     <p style="font-size:11.5px;color:var(--text3);margin-top:14px;line-height:1.65">By continuing, you confirm that you are 18 or older and agree to take part.</p>
@@ -311,7 +331,7 @@ h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--text)}
       <strong style="color:var(--text2)">Wenjun Yang</strong> · <a href="mailto:wy927@uw.edu" style="color:var(--blue);text-decoration:none">wy927@uw.edu</a>
       <br><br>
       Curious about the science behind this? Read the published paper:<br>
-      <a href="https://urldefense.com/v3/__https://ieeexplore.ieee.org/document/11218270__;!!K-Hz7m0Vt54!iRX6g_23aggjXKbedlaHn1FsXGUhSDt8Wk3cfhdRw2NiOWe9VC8LbvUjruKxNQfMIZFxQ74F_uOE$" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📄 IEEE Transactions on Privacy — "MIC-DP" (2025)</a>
+      <a href="https://ieeexplore.ieee.org/document/11218270" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">📄 IEEE Transactions on Privacy — "MIC-DP" (2025)</a>
     </div>
 
     <div class="actions" style="justify-content:center">
@@ -930,8 +950,8 @@ h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--text)}
   <div class="part-header">
     <div class="part-chip">F</div>
     <div>
-      <div class="part-title">How hard was the task?</div>
-      <div class="part-sub">3 quick questions about effort. Be honest — there is no right answer.</div>
+      <div class="part-title">How did the task feel?</div>
+      <div class="part-sub">3 quick questions about effort and how the experience felt. No right or wrong answers.</div>
     </div>
   </div>
 
@@ -958,13 +978,13 @@ h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--text)}
   </div>
 
   <div class="q-card">
-    <div class="q-title"><span class="q-num">CL3</span>How frustrated, irritated, or stressed were you while using the tool? <span style="color:var(--red)">★</span></div>
+    <div class="q-title"><span class="q-num">CL3</span>How relaxed or tense did you feel while using the tool? <span style="color:var(--red)">★</span></div>
     <div class="likert" id="qCL3">
-      <div class="lb" onclick="selSv('CL3',1,this)">1<span class="sub-l">Very low</span></div>
+      <div class="lb" onclick="selSv('CL3',1,this)">1<span class="sub-l">Very relaxed</span></div>
       <div class="lb" onclick="selSv('CL3',2,this)">2</div><div class="lb" onclick="selSv('CL3',3,this)">3</div>
-      <div class="lb" onclick="selSv('CL3',4,this)">4<span class="sub-l">Moderate</span></div>
+      <div class="lb" onclick="selSv('CL3',4,this)">4<span class="sub-l">Neutral</span></div>
       <div class="lb" onclick="selSv('CL3',5,this)">5</div><div class="lb" onclick="selSv('CL3',6,this)">6</div>
-      <div class="lb" onclick="selSv('CL3',7,this)">7<span class="sub-l">Very high</span></div>
+      <div class="lb" onclick="selSv('CL3',7,this)">7<span class="sub-l">Very tense</span></div>
     </div>
   </div>
 
@@ -1114,6 +1134,7 @@ function grantConsent(){
   paneEnterTs[0] = Date.now();
   document.getElementById('consent-overlay').classList.add('gone');
   document.getElementById('main-page').classList.remove('locked');
+  document.body.classList.add('light-mode');  // Part A pre-demo is light
   // kick off the demo init now that the page is visible (demo is on pane1 now)
   renderMicFeats();
   renderNoiseDistribution();
@@ -1169,6 +1190,8 @@ function updateProgress(n){
 
 function goPane(n){
   ['pane0','pane1','pane2','pane3'].forEach((p,i)=>document.getElementById(p).classList.toggle('on',i===n));
+  // Light theme for survey panes (0=Part A, 2=PrivAgent, 3=Survey); dark for demo (1)
+  document.body.classList.toggle('light-mode', n !== 1);
   updateProgress(n);
   window.scrollTo({top:0,behavior:'smooth'});
   paneEnterTs[n] = Date.now();
@@ -1788,29 +1811,29 @@ function updateW(){
 // ═══════════════════════════════════════════════
 const PROMPTS=[
   {axis:'LP/LA',
-   q:'Your power company wants to send you a monthly tip to help you save energy.',
-   a:{label:'Option A — keep me private',text:'Hide my data as much as possible. The monthly tip might be wrong sometimes (about 1 in 5).',winner:'LP'},
-   b:{label:'Option B — make the tip accurate',text:'Share a bit more. The tip will almost always be right.',winner:'LA'}},
+   q:'Your fitness or step-counter app wants to suggest a daily activity goal that fits you.',
+   a:{label:'Option A — keep me private',text:'Don\'t share my activity history. The suggested goal is generic — the same for everyone.',winner:'LP'},
+   b:{label:'Option B — make the suggestion fit me',text:'Share my activity history. The suggested goal matches my real fitness level.',winner:'LA'}},
   {axis:'LP/LA',
-   q:'Your neighborhood wants to predict when power use will be highest.',
-   a:{label:'Option A — keep me private',text:'Hide my data fully. The prediction could be off by up to an hour.',winner:'LP'},
-   b:{label:'Option B — make the prediction accurate',text:'Share a bit more. The prediction will be off by only 10 minutes.',winner:'LA'}},
+   q:'A music or streaming app wants to recommend songs and shows you\'ll enjoy.',
+   a:{label:'Option A — keep me private',text:'Don\'t track what I watch or listen to. Recommendations are generic — about as useful as flipping channels.',winner:'LP'},
+   b:{label:'Option B — make recommendations accurate',text:'Share what I watch and listen to. Recommendations closely match my taste.',winner:'LA'}},
   {axis:'LP/CR',
    q:'Privacy protection runs on your home device (like a small box or smart plug).',
    a:{label:'Option A — strongest privacy',text:'Strong protection. The device takes 3 seconds per update and uses more battery.',winner:'LP'},
    b:{label:'Option B — save battery',text:'Lighter protection. The device is fast and barely uses battery.',winner:'CR'}},
   {axis:'LP/CR',
-   q:'You\'re traveling for a week. Your home device must run on its battery only.',
-   a:{label:'Option A — strongest privacy',text:'Highest protection — but the battery runs out in 4 days. You may lose some data.',winner:'LP'},
-   b:{label:'Option B — save battery',text:'Lighter protection — the battery lasts the full week.',winner:'CR'}},
+   q:'You\'re out all day and can\'t charge your phone until you get home tonight.',
+   a:{label:'Option A — strongest privacy',text:'Keep maximum privacy on all my apps. The battery lasts about 6 hours — I may run out before getting home.',winner:'LP'},
+   b:{label:'Option B — save battery',text:'Use lighter privacy. The battery lasts the full 12 hours.',winner:'CR'}},
   {axis:'LA/CR',
    q:'You\'re looking at a "live" billing display in your app.',
    a:{label:'Option A — make it accurate',text:'Very accurate display, but it updates 5 seconds late. The device gets a bit warm.',winner:'LA'},
    b:{label:'Option B — keep it fast',text:'A bit less accurate. Updates instantly. Device stays cool.',winner:'CR'}},
   {axis:'LA/CR',
-   q:'You want a monthly summary of your energy use.',
-   a:{label:'Option A — make it accurate',text:'Most accurate summary. Your device works on it overnight.',winner:'LA'},
-   b:{label:'Option B — keep it fast',text:'Good summary. Your device finishes in 2 minutes.',winner:'CR'}}
+   q:'Your health or fitness app wants to give you a personalised weekly summary of your sleep and activity.',
+   a:{label:'Option A — make it accurate',text:'Very accurate summary with personal insights. Your phone runs the analysis overnight while charging.',winner:'LA'},
+   b:{label:'Option B — keep it fast',text:'Good-enough summary, less personal detail. Done in a couple of minutes.',winner:'CR'}}
 ];
 
 function renderPairwise(){
