@@ -322,17 +322,25 @@ h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--text)}
     <h1>Thank you!</h1>
     <p style="color:var(--text)">Your responses have been saved. Thank you for helping with this research.</p>
 
-    <h4>Your MTurk completion code</h4>
-    <div class="sid" id="thanks-code" style="font-size:20px;font-weight:700;padding:14px 20px;color:var(--blue);background:var(--bg2);border:2px solid var(--blue);letter-spacing:.08em">—</div>
-    <button class="btn btn-b" id="copy-code-btn" onclick="copyCompletionCode()" style="margin-top:10px;padding:8px 18px;font-size:12.5px">📋 Copy code</button>
-    <p style="font-size:12px;color:var(--text2);margin-top:12px;line-height:1.6">
-      <strong style="color:var(--text)">MTurk workers:</strong> copy the code above and paste it into the box on your HIT page to receive payment.<br>
-      <em>Do not close this window until you have copied the code.</em>
-    </p>
+    <h4>Your submission is complete</h4>
+    <div id="thanks-prolific-block">
+      <p style="font-size:13.5px;color:var(--text);margin:8px 0 12px">You will be returned to Prolific shortly to complete payment. If you are not redirected automatically, please click the button below.</p>
+      <div style="text-align:center;margin:14px 0">
+        <a id="thanks-prolific-link" href="#" style="display:inline-block;padding:14px 32px;background:var(--blue);color:#fff;text-decoration:none;border-radius:10px;font-size:15px;font-weight:600">← Return to Prolific</a>
+      </div>
+      <p style="font-size:11.5px;color:var(--text3);margin-top:6px;text-align:center">Auto-redirecting in <span id="thanks-countdown">5</span> seconds…</p>
+    </div>
 
-    <details style="margin-top:14px;font-size:11px;color:var(--text3)">
-      <summary style="cursor:pointer">Your anonymous session ID (for reference)</summary>
-      <div class="sid" id="thanks-sid" style="margin-top:6px;font-size:10px">—</div>
+    <div id="thanks-direct-block" style="display:none">
+      <p style="font-size:13px;color:var(--text2);margin:8px 0">Thank you for taking part in this research. Your responses have been recorded anonymously.</p>
+    </div>
+
+    <details style="margin-top:16px;font-size:11px;color:var(--text3)">
+      <summary style="cursor:pointer">Reference IDs (for your records only)</summary>
+      <div style="margin-top:6px">
+        <div>Session: <span id="thanks-sid" style="font-family:monospace">—</span></div>
+        <div style="margin-top:2px">Code: <span id="thanks-code" style="font-family:monospace">—</span></div>
+      </div>
     </details>
 
     <div class="contacts" style="text-align:left">
@@ -2285,41 +2293,34 @@ function showThankYou(sid){
   document.getElementById('thanks-overlay').classList.remove('gone');
   window.scrollTo({top:0});
 
-  // If participant came from Prolific, replace the "copy code" UX with a
-  // prominent "Return to Prolific" button that uses their platform's
-  // completion URL. Their unique participation is verified server-side by
-  // Prolific from the redirect, so we don't need them to hand-copy anything.
-  if(isFromProlific && PROLIFIC_COMPLETION_URL && !PROLIFIC_COMPLETION_URL.includes('YOUR_CODE')){
-    const codeBox = document.getElementById('thanks-code');
-    const copyBtn = document.getElementById('copy-code-btn');
-    const codeHeader = codeBox.previousElementSibling; // the <h4>
-    if(codeHeader) codeHeader.textContent = 'Return to Prolific to receive payment';
-    codeBox.innerHTML = `<a href="${PROLIFIC_COMPLETION_URL}" style="display:inline-block;padding:14px 32px;background:var(--blue);color:#fff;text-decoration:none;border-radius:10px;font-size:15px;font-weight:600">← Return to Prolific</a>`;
-    codeBox.style.border = 'none';
-    codeBox.style.background = 'transparent';
-    codeBox.style.padding = '10px 0';
-    if(copyBtn) copyBtn.style.display = 'none';
-    // Auto-redirect after 3 seconds so participants don't have to click
-    setTimeout(()=>{ window.location.href = PROLIFIC_COMPLETION_URL; }, 3000);
+  const prolificBlock = document.getElementById('thanks-prolific-block');
+  const directBlock = document.getElementById('thanks-direct-block');
+
+  if(isFromProlific && PROLIFIC_COMPLETION_URL){
+    // Prolific participant: show Return-to-Prolific + auto-redirect
+    prolificBlock.style.display = 'block';
+    directBlock.style.display = 'none';
+    document.getElementById('thanks-prolific-link').href = PROLIFIC_COMPLETION_URL;
+    let remaining = 5;
+    const cdEl = document.getElementById('thanks-countdown');
+    const tick = setInterval(()=>{
+      remaining -= 1;
+      if(cdEl) cdEl.textContent = String(remaining);
+      if(remaining <= 0){
+        clearInterval(tick);
+        window.location.href = PROLIFIC_COMPLETION_URL;
+      }
+    }, 1000);
+  } else {
+    // Direct visit (testing, pilot outside Prolific): plain thank-you
+    prolificBlock.style.display = 'none';
+    directBlock.style.display = 'block';
   }
 }
 
 function copyCompletionCode(){
-  const btn = document.getElementById('copy-code-btn');
-  const code = document.getElementById('thanks-code').textContent;
-  navigator.clipboard.writeText(code).then(()=>{
-    const original = btn.innerHTML;
-    btn.innerHTML = '✓ Copied!';
-    btn.style.background = 'var(--green)';
-    setTimeout(()=>{ btn.innerHTML = original; btn.style.background = ''; }, 2000);
-  }).catch(()=>{
-    // fallback: select text so user can copy manually
-    const range = document.createRange();
-    range.selectNode(document.getElementById('thanks-code'));
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-    alert('Code selected. Press Cmd+C (Mac) or Ctrl+C (Windows) to copy.');
-  });
+  // Retained as no-op for backward compat; the button was removed when the UI
+  // switched to a Prolific-first thank-you screen.
 }
 
 // Legacy/fallback — old genRec is now an alias that displays the payload locally
