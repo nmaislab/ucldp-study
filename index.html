@@ -322,9 +322,18 @@ h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--text)}
     <h1>Thank you!</h1>
     <p style="color:var(--text)">Your responses have been saved. Thank you for helping with this research.</p>
 
-    <h4>Your anonymous session ID</h4>
-    <div class="sid" id="thanks-sid">—</div>
-    <p style="font-size:11.5px;color:var(--text3);margin-top:6px">Thank you for your submission!</p>
+    <h4>Your MTurk completion code</h4>
+    <div class="sid" id="thanks-code" style="font-size:20px;font-weight:700;padding:14px 20px;color:var(--blue);background:var(--bg2);border:2px solid var(--blue);letter-spacing:.08em">—</div>
+    <button class="btn btn-b" id="copy-code-btn" onclick="copyCompletionCode()" style="margin-top:10px;padding:8px 18px;font-size:12.5px">📋 Copy code</button>
+    <p style="font-size:12px;color:var(--text2);margin-top:12px;line-height:1.6">
+      <strong style="color:var(--text)">MTurk workers:</strong> copy the code above and paste it into the box on your HIT page to receive payment.<br>
+      <em>Do not close this window until you have copied the code.</em>
+    </p>
+
+    <details style="margin-top:14px;font-size:11px;color:var(--text3)">
+      <summary style="cursor:pointer">Your anonymous session ID (for reference)</summary>
+      <div class="sid" id="thanks-sid" style="margin-top:6px;font-size:10px">—</div>
+    </details>
 
     <div class="contacts" style="text-align:left">
       If you have any questions about this research, please contact the researcher:<br>
@@ -1111,13 +1120,31 @@ const MAE_MIC=[0.69, 0.49, 0.27, 0.13, 0.07];   // MIC-DP MAE at each ε
 //   3. Deploy → New deployment → Web app → Execute as: Me · Who has access: Anyone
 //   4. Copy the resulting /macros/s/.../exec URL and paste it here
 // If left as the placeholder, Submit falls back to "Copy JSON" with a notice.
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzBaOD6f8ds7A45he1UCHv29_M88G8fS813lXEZlqt6Kr3XKFqYi7veTZckR9DqWGExBQ/exec";
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwRgyMcxPMtpxUv9n6nqW-_Vats23MhFh3bLHpFtbyAbZxjJdkskuG94FKfgM7kd5FR9A/exec";
 
 // session-scoped state
 let sessionId = null;
+let completionCode = null;
 let consentedAt = null;
 let startedAt = null;  // when participant clicked "I agree"
 let paneEnterTs = {0:null,1:null,2:null,3:null};  // time when each pane was entered
+
+// ─── Prolific / MTurk / CloudResearch integration ────────────────
+// Read platform-side worker/study IDs from the URL if present. Participants
+// arriving from Prolific will have ?PROLIFIC_PID=xxx&STUDY_ID=yyy&SESSION_ID=zzz
+// appended by Prolific. We use these ONLY to route the participant back to
+// the platform at the end (via redirect URL) — we do NOT store the PID in
+// our dataset (see IRB protocol: no identifiers collected).
+const urlParams = new URLSearchParams(window.location.search);
+const PROLIFIC_PID = urlParams.get('PROLIFIC_PID');
+const PROLIFIC_STUDY_ID = urlParams.get('STUDY_ID');
+const PROLIFIC_SESSION_ID = urlParams.get('SESSION_ID');
+const isFromProlific = PROLIFIC_PID && PROLIFIC_PID.length > 5;
+
+// Set this to the URL Prolific gives you on the "Completion paths" screen —
+// something like "https://app.prolific.com/submissions/complete?cc=CXXXXXXX"
+// The full URL, WITH the "cc=" completion-code query already appended.
+const PROLIFIC_COMPLETION_URL = "https://app.prolific.com/submissions/complete?cc=C13MTOW4";
 
 function makeSessionId(){
   if(window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
@@ -1127,8 +1154,21 @@ function makeSessionId(){
   });
 }
 
+// Short human-friendly code for MTurk / Prolific completion verification.
+// Format: UCLDP-XXXXXX where X is [A-Z0-9] without confusing chars (no 0/O, no 1/I).
+function makeCompletionCode(){
+  const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // no 0/O, no 1/I
+  let code = 'UCLDP-';
+  const buf = new Uint32Array(6);
+  if(window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(buf);
+  else for(let i=0;i<6;i++) buf[i] = Math.floor(Math.random()*0xffffffff);
+  for(let i=0;i<6;i++) code += CHARS[buf[i] % CHARS.length];
+  return code;
+}
+
 function grantConsent(){
   sessionId = makeSessionId();
+  completionCode = makeCompletionCode();
   consentedAt = new Date().toISOString();
   startedAt = Date.now();
   paneEnterTs[0] = Date.now();
@@ -2044,7 +2084,9 @@ function buildPayload(){
   const elapsedMs = startedAt ? (Date.now() - startedAt) : null;
   return {
     session_id: sessionId,
+    completion_code: completionCode,
     survey_version: 'v3.0_hci_full',
+    recruitment_source: isFromProlific ? 'prolific' : 'direct',
     consented_at: consentedAt,
     submitted_at: new Date().toISOString(),
     time_to_complete_seconds: elapsedMs ? Math.round(elapsedMs / 1000) : null,
@@ -2238,9 +2280,46 @@ async function submitResponses(){
 
 function showThankYou(sid){
   document.getElementById('thanks-sid').textContent=sid;
+  document.getElementById('thanks-code').textContent=completionCode;
   document.getElementById('main-page').classList.add('locked');
   document.getElementById('thanks-overlay').classList.remove('gone');
   window.scrollTo({top:0});
+
+  // If participant came from Prolific, replace the "copy code" UX with a
+  // prominent "Return to Prolific" button that uses their platform's
+  // completion URL. Their unique participation is verified server-side by
+  // Prolific from the redirect, so we don't need them to hand-copy anything.
+  if(isFromProlific && PROLIFIC_COMPLETION_URL && !PROLIFIC_COMPLETION_URL.includes('YOUR_CODE')){
+    const codeBox = document.getElementById('thanks-code');
+    const copyBtn = document.getElementById('copy-code-btn');
+    const codeHeader = codeBox.previousElementSibling; // the <h4>
+    if(codeHeader) codeHeader.textContent = 'Return to Prolific to receive payment';
+    codeBox.innerHTML = `<a href="${PROLIFIC_COMPLETION_URL}" style="display:inline-block;padding:14px 32px;background:var(--blue);color:#fff;text-decoration:none;border-radius:10px;font-size:15px;font-weight:600">← Return to Prolific</a>`;
+    codeBox.style.border = 'none';
+    codeBox.style.background = 'transparent';
+    codeBox.style.padding = '10px 0';
+    if(copyBtn) copyBtn.style.display = 'none';
+    // Auto-redirect after 3 seconds so participants don't have to click
+    setTimeout(()=>{ window.location.href = PROLIFIC_COMPLETION_URL; }, 3000);
+  }
+}
+
+function copyCompletionCode(){
+  const btn = document.getElementById('copy-code-btn');
+  const code = document.getElementById('thanks-code').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    const original = btn.innerHTML;
+    btn.innerHTML = '✓ Copied!';
+    btn.style.background = 'var(--green)';
+    setTimeout(()=>{ btn.innerHTML = original; btn.style.background = ''; }, 2000);
+  }).catch(()=>{
+    // fallback: select text so user can copy manually
+    const range = document.createRange();
+    range.selectNode(document.getElementById('thanks-code'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    alert('Code selected. Press Cmd+C (Mac) or Ctrl+C (Windows) to copy.');
+  });
 }
 
 // Legacy/fallback — old genRec is now an alias that displays the payload locally
